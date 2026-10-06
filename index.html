@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tender Package Builder | Pro Version</title>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb; --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc; --surface: #ffffff;
+            --text-main: #0f172a; --text-muted: #64748b;
+            --border: #e2e8f0; --border-focus: #94a3b8;
+            --success-bg: #dcfce7; --success-text: #166534;
+            --danger-bg: #fee2e2; --danger-text: #991b1b;
+            --warning-bg: #fef9c3; --warning-text: #854d0e;
+            --neutral-bg: #f1f5f9; --neutral-text: #475569;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* App Header */
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: var(--surface); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .app-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+        .app-subtitle { color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem; }
+        .btn-group { display: flex; gap: 1rem; }
+        .btn-outline { padding: 0.5rem 1rem; background: white; border: 1px solid var(--border); border-radius: 8px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: 0.2s; }
+        .btn-outline:hover { background: var(--neutral-bg); border-color: var(--border-focus); }
+        .btn-reset { color: #dc2626; border-color: #fca5a5; }
+        .btn-reset:hover { background: #fef2f2; border-color: #ef4444; }
+
+        /* Card Layout */
+        .card { background: var(--surface); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        
+        /* Grid Info */
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+        .info-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+        .info-value { font-size: 1rem; font-weight: 500; }
+
+        /* Upload Area */
+        .upload-zone { border: 2px dashed #cbd5e1; padding: 3rem 2rem; text-align: center; border-radius: 12px; background: var(--neutral-bg); cursor: pointer; position: relative; transition: all 0.2s; }
+        .upload-zone:hover { border-color: var(--primary); background: #eff6ff; }
+        .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .upload-icon { color: var(--primary); margin-bottom: 1rem; }
+
+        /* JSON Upload Area Special */
+        .json-upload-zone { border: 2px dashed var(--primary); background: #eff6ff; padding: 4rem 2rem; }
+        
+        /* Uploaded Files List */
+        .file-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .file-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .file-detail { display: flex; flex-direction: column; overflow: hidden; }
+        .file-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .badge-duplicate { background: var(--danger-bg); color: var(--danger-text); padding: 0.1rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-top: 0.25rem; display: inline-block; }
+        
+        /* Table */
+        .table-wrapper { overflow-x: auto; margin-top: 1rem; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: var(--neutral-bg); padding: 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 2px solid var(--border); }
+        td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+
+        /* Form Elements */
+        select, input[type="date"] { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: inherit; transition: 0.2s; outline: none; background: var(--surface); color: var(--text-main); }
+        select:focus, input[type="date"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        select:disabled { background: var(--neutral-bg); cursor: not-allowed; }
+
+        /* Status Badges */
+        .badge { padding: 0.4rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .b-missing, .b-expired { background: var(--danger-bg); color: var(--danger-text); }
+        .b-expiryNeeded { background: var(--warning-bg); color: var(--warning-text); }
+        .b-ok { background: var(--success-bg); color: var(--success-text); }
+        .b-optional { background: var(--neutral-bg); color: var(--neutral-text); }
+
+        /* Action Area */
+        .action-area { position: sticky; bottom: 2rem; background: var(--surface); padding: 1.5rem; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 1rem; z-index: 100; }
+        .btn-generate { padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+        .btn-generate:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-generate:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.8; }
+        .error-box { background: var(--danger-bg); color: var(--danger-text); border: 1px solid #f87171; padding: 1rem; border-radius: 10px; font-size: 0.9rem; }
+        
+        .icon-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 6px; }
+        .icon-btn:hover { background: var(--danger-bg); color: var(--danger-text); }
+
+        #loading-screen { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; color: #333; }
+        
+        /* Hide sections initially */
+        #workspace-area { display: none; }
+        #json-upload-area { display: block; }
+    </style>
+</head>
+<body>
+
+<div id="loading-screen">Connecting to Local Database...</div>
+
+<div class="container">
+    <header class="app-header">
+        <div>
+            <h1 class="app-title" id="app-title">Tender Package Builder</h1>
+            <p class="app-subtitle">Developer: Mahmud Al-Hadi (251-35-505) | AI DevFest 2026</p>
+        </div>
+        <div class="btn-group">
+            <button class="btn-outline btn-reset" onclick="hardReset()" id="btn-reset">Reset All Data</button>
+            <button class="btn-outline" onclick="toggleLanguage()" id="btn-lang">বাংলায় দেখুন</button>
+        </div>
+    </header>
+
+    <!-- STEP 0: JSON Upload Area -->
+    <div class="card" id="json-upload-area">
+        <div class="card-header">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            <span id="title-load-json">Step 1: Load Requirements</span>
+        </div>
+        <div class="upload-zone json-upload-zone">
+            <input type="file" accept="application/json" onchange="handleJsonUpload(event)">
+            <svg class="upload-icon" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <h3 id="json-hint" style="margin-bottom: 0.5rem; font-size: 1.5rem;">Upload requirements.json</h3>
+            <p id="json-subhint" style="color: var(--text-muted);">Please provide the tender data JSON file to begin.</p>
+        </div>
+    </div>
+
+    <!-- Workspace Area -->
+    <div id="workspace-area">
+        <div class="card">
+            <div class="card-header">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="title-tender">Tender Information</span>
+            </div>
+            <div class="info-grid" id="tender-details"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                <span id="title-upload">Upload Documents (PDF Only)</span>
+            </div>
+            <div class="upload-zone">
+                <input type="file" accept="application/pdf" multiple onchange="handlePdfUpload(event)">
+                <svg class="upload-icon" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                <h3 id="upload-hint" style="margin-bottom: 0.5rem;">Click or drag PDF files here</h3>
+                <p id="upload-subhint" style="color: var(--text-muted); font-size: 0.875rem;">Duplicate contents will be detected automatically.</p>
+            </div>
+            <div class="file-list" id="uploaded-files-list"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                <span id="title-match">Match Requirements</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th id="th-req" style="width: 35%">Requirement</th>
+                            <th id="th-file" style="width: 30%">Matched File</th>
+                            <th id="th-expiry" style="width: 20%">Expiry Date</th>
+                            <th id="th-status" style="width: 15%">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requirements-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="action-area">
+            <div class="error-box" id="blocking-errors" style="display: none;"></div>
+            <button class="btn-generate" id="btn-generate" onclick="generatePackage()" disabled>
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span id="btn-gen-text">Generate Package</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Emergency Failsafe ---
+    // If the browser strictly blocks IndexedDB or pdf-lib hangs, hide loader after 1.5s
+    setTimeout(() => {
+        const loader = document.getElementById('loading-screen');
+        if(loader && loader.style.display !== 'none') {
+            loader.style.display = 'none';
+            console.warn("Failsafe triggered: Forced loading screen to hide. Local Storage might be disabled.");
+        }
+    }, 1500);
+
+    // --- State ---
+    let currentLang = 'en'; 
+    let tenderData = null; 
+    let requirements = []; 
+    let uploadedFiles = []; 
+    let matches = {}; 
+    let expiries = {}; 
+
+    // --- Safe IndexedDB ---
+    const DB_NAME = "DevFestTenderApp_V4";
+    let db = null;
+
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            if (!window.indexedDB) return reject("IndexedDB not supported");
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (event) => {
+                const database = event.target.result;
+                if (!database.objectStoreNames.contains('files')) database.createObjectStore('files', { keyPath: 'id' });
+                if (!database.objectStoreNames.contains('appState')) database.createObjectStore('appState');
+            };
+            request.onsuccess = (event) => resolve(event.target.result);
+            request.onerror = (event) => reject(event.target.error);
+        });
+    }
+
+    function safeDBAction(storeName, mode, callback) {
+        return new Promise((resolve) => {
+            if (!db) return resolve(null);
+            try {
+                const tx = db.transaction(storeName, mode);
+                const store = tx.objectStore(storeName);
+                const req = callback(store);
+                if(req) {
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => resolve(null);
+                } else {
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => resolve(null);
+                }
+            } catch (e) { resolve(null); }
+        });
+    }
+
+    function saveState() {
+        if (!db) return;
+        safeDBAction('appState', 'readwrite', (store) => {
+            store.put(tenderData, 'tenderData');
+            store.put(requirements, 'requirements');
+            store.put(matches, 'matches');
+            store.put(expiries, 'expiries');
+            return null;
+        });
+    }
+
+    // --- App Load using DOMContentLoaded instead of window.onload ---
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject("DB Init Timeout"), 500));
+            db = await Promise.race([initDB(), timeoutPromise]);
+            
+            tenderData = await safeDBAction('appState', 'readonly', s => s.get('tenderData'));
+            const reqData = await safeDBAction('appState', 'readonly', s => s.get('requirements'));
+            if (reqData) requirements = reqData;
+            
+            const matchData = await safeDBAction('appState', 'readonly', s => s.get('matches'));
+            if (matchData) matches = matchData;
+            
+            const expData = await safeDBAction('appState', 'readonly', s => s.get('expiries'));
+            if (expData) expiries = expData;
+
+            const fileData = await safeDBAction('files', 'readonly', s => s.getAll());
+            if (fileData) uploadedFiles = fileData;
+            
+        } catch (e) {
+            console.warn("DB Failed or Blocked (file:// mode):", e);
+        } finally {
+            checkDuplicates();
+            document.getElementById('loading-screen').style.display = 'none';
+            renderApp();
+        }
+    });
+
+    async function hardReset() {
+        if(confirm("Are you sure? This will delete the tender data and all uploaded PDFs.")) {
+            tenderData = null; requirements = []; matches = {}; expiries = {}; uploadedFiles = [];
+            if (db) {
+                await safeDBAction('appState', 'readwrite', s => s.clear());
+                await safeDBAction('files', 'readwrite', s => s.clear());
+            }
+            renderApp();
+        }
+    }
+
+    // --- Upload Handlers ---
+    async function handleJsonUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            
+            if(!data.tender || !data.requirements) {
+                alert("Invalid format! The JSON must contain 'tender' and 'requirements' arrays.");
+                return;
+            }
+            
+            tenderData = data.tender;
+            requirements = data.requirements;
+            saveState();
+            renderApp();
+        } catch (error) {
+            alert("Error reading JSON file. Please ensure it's valid JSON.");
+        }
+    }
+
+    async function handlePdfUpload(event) {
+        for (let file of event.target.files) {
+            if (file.type !== "application/pdf") { alert(`${file.name} is not a PDF.`); continue; }
+            const buffer = await file.arrayBuffer(); 
+            let pages = 0;
+            try { 
+                const pdf = await PDFLib.PDFDocument.load(buffer); 
+                pages = pdf.getPageCount(); 
+            } catch(e) { alert(`${file.name} is corrupted.`); continue; }
+            
+            const fileObj = { id: 'file_' + Date.now() + Math.random().toString(16).slice(2), name: file.name, buffer: buffer, pages: pages, isDuplicate: false };
+            uploadedFiles.push(fileObj);
+            
+            if(db) await safeDBAction('files', 'readwrite', s => { s.put(fileObj); return null; });
+        }
+        event.target.value = ''; 
+        checkDuplicates(); renderApp();
+    }
+
+    function removeFile(fileId) {
+        uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
+        for (let reqId in matches) if (matches[reqId] === fileId) { delete matches[reqId]; delete expiries[reqId]; }
+        if(db) safeDBAction('files', 'readwrite', s => { s.delete(fileId); return null; });
+        checkDuplicates(); saveState(); renderApp();
+    }
+
+    function checkDuplicates() {
+        uploadedFiles.forEach(f => f.isDuplicate = false);
+        for (let i = 0; i < uploadedFiles.length; i++) {
+            for (let j = i + 1; j < uploadedFiles.length; j++) {
+                if (uploadedFiles[i].buffer.byteLength === uploadedFiles[j].buffer.byteLength) {
+                    const a = new Uint8Array(uploadedFiles[i].buffer);
+                    const b = new Uint8Array(uploadedFiles[j].buffer);
+                    let isSame = true;
+                    for (let k = 0; k < a.length; k++) { if (a[k] !== b[k]) { isSame = false; break; } }
+                    if(isSame) {
+                        uploadedFiles[i].isDuplicate = true;
+                        uploadedFiles[j].isDuplicate = true;
+                    }
+                }
+            }
+        }
+    }
+
+    function getStatus(req) {
+        if(!tenderData) return { code: 'missing', block: true, css: 'b-missing' };
+        
+        const fileId = matches[req.id];
+        if (req.mandatory && !fileId) return { code: 'missing', block: true, css: 'b-missing' };
+        if (!req.mandatory && !fileId) return { code: 'notProvided', block: false, css: 'b-optional' };
+        if (req.has_expiry && fileId) {
+            if (!expiries[req.id]) return { code: 'expiryNeeded', block: true, css: 'b-expiryNeeded' };
+            if (new Date(expiries[req.id]) < new Date(tenderData.submission_deadline)) return { code: 'expired', block: true, css: 'b-expired' };
+        }
+        return { code: 'ok', block: false, css: 'b-ok' };
+    }
+
+    // --- Localization ---
+    const tDict = {
+        en: { appTitle: "Tender Package Builder", btnLang: "বাংলায় দেখুন", jsonLoad: "Step 1: Load Requirements", jsonHint: "Upload requirements.json", jsonSub: "Please provide the tender data JSON file to begin.", uploadTitle: "Upload Documents (PDF Only)", uploadHint: "Click or drag PDF files here", uploadSub: "Duplicate contents will be detected automatically.", matchTitle: "Match Requirements", thReq: "Requirement", thFile: "Matched File", thExpiry: "Expiry Date", thStatus: "Status", btnGen: "Generate Package", optional: "Optional", missing: "Missing", expiryNeeded: "Expiry date needed", expired: "Expired", notProvided: "Not provided", ok: "OK", id: "Tender ID", title: "Title", entity: "Procuring Entity", bidder: "Bidder", dl: "Submission Deadline", reset: "Reset All Data" },
+        bn: { appTitle: "দরপত্র প্যাকেজ নির্মাতা", btnLang: "View in English", jsonLoad: "ধাপ ১: প্রয়োজনীয়তা লোড করুন", jsonHint: "requirements.json আপলোড করুন", jsonSub: "শুরু করতে দরপত্রের JSON ফাইল প্রদান করুন।", uploadTitle: "নথিপত্র আপলোড করুন (শুধুমাত্র PDF)", uploadHint: "আপনার পিডিএফ ফাইল এখানে ড্র্যাগ করুন", uploadSub: "একই বিষয়বস্তুর ফাইল স্বয়ংক্রিয়ভাবে শনাক্ত হবে।", matchTitle: "প্রয়োজনীয়তা মেলান", thReq: "প্রয়োজনীয়তা", thFile: "ফাইল", thExpiry: "মেয়াদ", thStatus: "অবস্থা", btnGen: "প্যাকেজ তৈরি করুন", optional: "ঐচ্ছিক", missing: "অনুপস্থিত", expiryNeeded: "তারিখ প্রয়োজন", expired: "মেয়াদোত্তীর্ণ", notProvided: "দেওয়া হয়নি", ok: "সঠিক", id: "দরপত্র আইডি", title: "শিরোনাম", entity: "ক্রয়কারী সংস্থা", bidder: "বিডার", dl: "জমা দেওয়ার তারিখ", reset: "সব ডেটা মুছুন" }
+    };
+    function toggleLanguage() { currentLang = currentLang === 'en' ? 'bn' : 'en'; renderApp(); }
+
+    function renderApp() {
+        const t = tDict[currentLang];
+        document.getElementById('app-title').innerText = t.appTitle; document.getElementById('btn-lang').innerText = t.btnLang;
+        document.getElementById('btn-reset').innerText = t.reset;
+        
+        if(!tenderData) {
+            document.getElementById('json-upload-area').style.display = 'block';
+            document.getElementById('workspace-area').style.display = 'none';
+            document.getElementById('title-load-json').innerText = t.jsonLoad;
+            document.getElementById('json-hint').innerText = t.jsonHint;
+            document.getElementById('json-subhint').innerText = t.jsonSub;
+            return;
+        } else {
+            document.getElementById('json-upload-area').style.display = 'none';
+            document.getElementById('workspace-area').style.display = 'block';
+        }
+
+        document.getElementById('title-upload').innerText = t.uploadTitle;
+        document.getElementById('upload-hint').innerText = t.uploadHint; document.getElementById('upload-subhint').innerText = t.uploadSub;
+        document.getElementById('title-match').innerText = t.matchTitle;
+        document.getElementById('th-req').innerText = t.thReq; document.getElementById('th-file').innerText = t.thFile;
+        document.getElementById('th-expiry').innerText = t.thExpiry; document.getElementById('th-status').innerText = t.thStatus;
+        document.getElementById('btn-gen-text').innerText = t.btnGen;
+
+        document.getElementById('tender-details').innerHTML = `
+            <div class="info-item"><span class="info-label">${t.id}</span><span class="info-value">${tenderData.tender_id}</span></div>
+            <div class="info-item"><span class="info-label">${t.title}</span><span class="info-value">${tenderData.title}</span></div>
+            <div class="info-item"><span class="info-label">${t.entity}</span><span class="info-value">${tenderData.procuring_entity}</span></div>
+            <div class="info-item"><span class="info-label">${t.bidder}</span><span class="info-value">${tenderData.bidder}</span></div>
+            <div class="info-item"><span class="info-label">${t.dl}</span><span class="info-value" style="color:var(--primary); font-weight:700;">${tenderData.submission_deadline}</span></div>
+        `;
+
+        document.getElementById('uploaded-files-list').innerHTML = uploadedFiles.map(f => `
+            <div class="file-card">
+                <div class="file-detail">
+                    <span class="file-name" title="${f.name}">${f.name}</span>
+                    <span class="file-meta">${f.pages} pages</span>
+                    ${f.isDuplicate ? `<span class="badge-duplicate">Duplicate: Please delete</span>` : ''}
+                </div>
+                <button class="icon-btn" onclick="removeFile('${f.id}')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+            </div>
+        `).join('');
+
+        const tbody = document.getElementById('requirements-body'); tbody.innerHTML = '';
+        let hasError = false; let errorList = [];
+
+        requirements.sort((a, b) => a.order - b.order).forEach(req => {
+            const stat = getStatus(req);
+            const reqTitle = currentLang === 'en' ? req.title_en : req.title_bn;
+            if (stat.block) { hasError = true; errorList.push(`${reqTitle}: ${t[stat.code]}`); }
+
+            let opts = `<option value="">-- Select File --</option>`;
+            uploadedFiles.forEach(f => {
+                const usedByOther = Object.values(matches).includes(f.id) && matches[req.id] !== f.id;
+                if (!f.isDuplicate && !usedByOther) {
+                    opts += `<option value="${f.id}" ${matches[req.id] === f.id ? 'selected' : ''}>${f.name}</option>`;
+                }
+            });
+
+            if (matches[req.id]) {
+                const matchedFile = uploadedFiles.find(file => file.id === matches[req.id]);
+                if (!matchedFile || matchedFile.isDuplicate) { updateMatch(req.id, ""); return; }
+            }
+
+            const tag = !req.mandatory ? `<span style="font-size:0.75rem; color:var(--text-muted); margin-left:8px; font-weight:normal;">${t.optional}</span>` : '';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>
+                        <div style="font-weight:600; display:flex; align-items:center; gap:0.5rem">
+                            <span>${req.order}. ${reqTitle}</span>${tag}
+                        </div>
+                    </td>
+                    <td><select onchange="updateMatch('${req.id}', this.value)">${opts}</select></td>
+                    <td>${req.has_expiry && matches[req.id] ? `<input type="date" value="${expiries[req.id] \vert{}\vert{} ''}" onchange="updateExpiry('${req.id}', this.value)">` : '-'}</td>
+                    <td><div class="badge ${stat.css}">${t[stat.code]}</div></td>
+                </tr>
+            `;
+        });
+
+        const btnGen = document.getElementById('btn-generate');
+        const errBox = document.getElementById('blocking-errors');
+        if (hasError || requirements.length === 0) {
+            btnGen.disabled = true; 
+            if(requirements.length > 0) {
+                errBox.style.display = 'block';
+                errBox.innerHTML = `<strong>Action Required:</strong><ul style="margin-top:0.5rem; margin-left:1.2rem;"><li>${errorList.join('</li><li>')}</li></ul>`;
+            } else { errBox.style.display = 'none'; }
+        } else { btnGen.disabled = false; errBox.style.display = 'none'; }
+    }
+
+    function updateMatch(reqId, val) { if(!val){ delete matches[reqId]; delete expiries[reqId]; } else matches[reqId] = val; saveState(); renderApp(); }
+    function updateExpiry(reqId, val) { expiries[reqId] = val; saveState(); renderApp(); }
+
+    async function generatePackage() {
+        const btnText = document.getElementById('btn-gen-text'); btnText.innerText = "Processing Document..."; document.getElementById('btn-generate').disabled = true;
+        try {
+            const { PDFDocument, rgb, StandardFonts } = PDFLib; 
+            const finalDoc = await PDFDocument.create();
+            const font = await finalDoc.embedFont(StandardFonts.Helvetica); 
+            const boldFont = await finalDoc.embedFont(StandardFonts.HelveticaBold);
+            const cvr = finalDoc.addPage(); 
+            let y = cvr.getSize().height - 80;
+
+            const write = (txt, sz, bld, gap) => { cvr.drawText(txt, { x: 50, y, size: sz, font: bld ? boldFont : font }); y -= gap; };
+
+            write("TENDER DOCUMENT PACKAGE", 22, true, 40);
+            write(`Tender ID: ${tenderData.tender_id}`, 12, false, 25); write(`Title: ${tenderData.title}`, 12, false, 25);
+            write(`Procuring Entity: ${tenderData.procuring_entity}`, 12, false, 25); write(`Bidder: ${tenderData.bidder}`, 12, false, 25);
+            write(`Submission Deadline: ${tenderData.submission_deadline}`, 12, false, 25); write(`Date Generated: ${new Date().toISOString().split('T')[0]}`, 12, false, 50);
+            write("Included Documents (in order):", 16, true, 30);
+
+            for (const req of [...requirements].sort((a,b) => a.order - b.order)) {
+                if (matches[req.id]) {
+                    const f = uploadedFiles.find(x => x.id === matches[req.id]);
+                    write(`${req.order}. ${req.title_en} - (${f.name})`, 11, false, 25);
+                    const srcDoc = await PDFDocument.load(f.buffer); 
+                    const pgs = await finalDoc.copyPages(srcDoc, srcDoc.getPageIndices());
+                    pgs.forEach(p => finalDoc.addPage(p));
+                } else if (!req.mandatory) {
+                    cvr.drawText(`${req.order}. ${req.title_en} - (Not Provided)`, { x:50, y, size:11, font, color: rgb(0.5,0.5,0.5) }); y-=25;
+                }
+            }
+
+            const tPages = finalDoc.getPageCount(); const pages = finalDoc.getPages();
+            for (let i = 0; i < tPages; i++) {
+                const p = pages[i]; const w = p.getSize().width;
+                p.drawRectangle({ x: 0, y: 10, width: w, height: 25, color: rgb(1, 1, 1) });
+                p.drawText(`${tenderData.tender_id} | Page ${i+1} of ${tPages}`, { x: w/2 - 60, y: 18, size: 10, font });
+            }
+
+            const blob = new Blob([await finalDoc.save()], { type: 'application/pdf' }); 
+            const lnk = document.createElement('a'); lnk.href = URL.createObjectURL(blob); lnk.download = `${tenderData.tender_id}_Package.pdf`; lnk.click();
+        } catch (e) { alert("Error generating PDF. Please check your files."); console.error(e); } 
+        finally { btnText.innerText = tDict[currentLang].btnGen; renderApp(); }
+    }
+</script>
+</body>
+</html>
