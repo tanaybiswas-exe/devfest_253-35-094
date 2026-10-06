@@ -3,91 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tender Package Builder | DevFest Ultimate</title>
+    <title>Tender Package Builder | Enterprise Edition</title>
     
     <!-- External Libraries -->
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #2563eb; --primary-hover: #1d4ed8;
-            --bg-color: #f8fafc; --surface: #ffffff;
-            --text-main: #0f172a; --text-muted: #64748b;
-            --border: #e2e8f0; --border-focus: #94a3b8;
-            --success-bg: #dcfce7; --success-text: #166534;
-            --danger-bg: #fee2e2; --danger-text: #991b1b;
-            --warning-bg: #fef9c3; --warning-text: #854d0e;
-            --neutral-bg: #f1f5f9; --neutral-text: #475569;
+            /* Premium Color Palette */
+            --primary: #4F46E5; 
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            --bg-color: #F8FAFC; 
+            --surface: #FFFFFF;
+            --text-main: #0F172A; 
+            --text-muted: #64748B;
+            --border: #E2E8F0; 
+            --border-hover: #CBD5E1;
+            
+            /* Status Colors */
+            --success-bg: #ECFDF5; --success-text: #059669;
+            --danger-bg: #FEF2F2; --danger-text: #DC2626;
+            --warning-bg: #FFFBEB; --warning-text: #D97706;
+            --neutral-bg: #F1F5F9; --neutral-text: #475569;
+
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.06);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 2rem; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; padding-bottom: 6rem; }
 
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: var(--surface); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        .app-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-        .app-subtitle { color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem; }
+        /* App Header */
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: var(--surface); padding: 1.5rem 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.5); }
+        .app-title { font-size: 1.75rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .app-subtitle { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; margin-top: 0.25rem; }
         .btn-group { display: flex; gap: 1rem; }
-        .btn-outline { padding: 0.5rem 1rem; background: white; border: 1px solid var(--border); border-radius: 8px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: 0.2s; }
-        .btn-outline:hover { background: var(--neutral-bg); border-color: var(--border-focus); }
-        .btn-reset { color: #dc2626; border-color: #fca5a5; }
-        .btn-reset:hover { background: #fef2f2; border-color: #ef4444; }
+        
+        /* Buttons */
+        .btn-outline { padding: 0.6rem 1.25rem; background: white; border: 2px solid var(--border); border-radius: var(--radius-md); font-weight: 600; color: var(--text-main); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-outline:hover { background: var(--neutral-bg); border-color: var(--border-hover); transform: translateY(-1px); }
+        .btn-reset { color: var(--danger-text); border-color: #FECACA; background: #FEF2F2;}
+        .btn-reset:hover { background: #FEE2E2; border-color: #F87171; }
 
-        .card { background: var(--surface); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        .card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        /* Card Layout */
+        .card { background: var(--surface); border-radius: var(--radius-lg); padding: 2.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-soft); border: 1px solid rgba(226, 232, 240, 0.6); transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 15px 40px -10px rgba(0,0,0,0.08); }
+        .card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; font-size: 1.35rem; font-weight: 700; color: var(--text-main); border-bottom: 2px solid var(--neutral-bg); padding-bottom: 1.25rem; }
+        .icon-wrapper { background: #EEF2FF; color: var(--primary); padding: 0.6rem; border-radius: 10px; display: flex; }
 
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
-        .info-item { display: flex; flex-direction: column; gap: 0.25rem; }
-        .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
-        .info-value { font-size: 1rem; font-weight: 500; }
+        /* Grid Info */
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: #F8FAFC; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .info-item { display: flex; flex-direction: column; gap: 0.3rem; }
+        .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; }
+        .info-value { font-size: 1.05rem; font-weight: 600; color: #1E293B; }
 
-        .upload-zone { border: 2px dashed #cbd5e1; padding: 3rem 2rem; text-align: center; border-radius: 12px; background: var(--neutral-bg); cursor: pointer; position: relative; transition: all 0.2s; }
-        .upload-zone:hover { border-color: var(--primary); background: #eff6ff; }
+        /* Upload Zones */
+        .upload-zone { border: 2px dashed #CBD5E1; padding: 3rem 2rem; text-align: center; border-radius: var(--radius-md); background: #F8FAFC; cursor: pointer; position: relative; transition: all 0.3s; }
+        .upload-zone:hover { border-color: var(--primary); background: #EEF2FF; }
         .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-        .upload-icon { color: var(--primary); margin-bottom: 1rem; }
-        .json-upload-zone { border: 2px dashed var(--primary); background: #eff6ff; padding: 4rem 2rem; }
+        .upload-icon { color: var(--primary); margin-bottom: 1rem; opacity: 0.8; transition: transform 0.3s; }
+        .upload-zone:hover .upload-icon { transform: scale(1.1); opacity: 1; }
 
+        .json-upload-zone { border: 2px dashed var(--primary); background: #EEF2FF; padding: 5rem 2rem; }
+        
+        /* File List */
         .file-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-        .file-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .file-detail { display: flex; flex-direction: column; overflow: hidden; width: 80%; }
-        .file-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .file-meta { font-size: 0.8rem; color: var(--text-muted); }
-        .badge-duplicate { background: var(--danger-bg); color: var(--danger-text); padding: 0.1rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-top: 0.25rem; display: inline-block; width: max-content; }
-
-        .table-wrapper { overflow-x: auto; margin-top: 1rem; border-radius: 12px; border: 1px solid var(--border); }
+        .file-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .file-detail { display: flex; flex-direction: column; overflow: hidden; width: 85%; }
+        .file-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #334155; }
+        .file-meta { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .badge-duplicate { background: var(--danger-bg); color: var(--danger-text); padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-top: 0.4rem; display: inline-block; width: max-content; }
+        
+        /* Table */
+        .table-wrapper { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: var(--neutral-bg); padding: 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 2px solid var(--border); }
-        td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: middle; }
+        th { background: #F8FAFC; padding: 1.25rem 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; border-bottom: 2px solid var(--border); }
+        td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--neutral-bg); font-size: 0.95rem; vertical-align: middle; font-weight: 500;}
         tr:last-child td { border-bottom: none; }
 
-        select, input[type="date"], input[type="text"] { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: inherit; transition: 0.2s; outline: none; background: var(--surface); color: var(--text-main); }
-        select:focus, input[type="date"]:focus, input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-
-        .badge { padding: 0.4rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; }
+        /* Form Inputs */
+        select, input[type="date"], input[type="text"] { width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.95rem; font-weight: 500; font-family: inherit; transition: 0.2s; outline: none; background: #F8FAFC; color: var(--text-main); }
+        select:focus, input[type="date"]:focus, input[type="text"]:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        
+        /* Badges */
+        .badge { padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0.02em; }
         .b-missing, .b-expired { background: var(--danger-bg); color: var(--danger-text); }
         .b-expiryNeeded { background: var(--warning-bg); color: var(--warning-text); }
         .b-ok { background: var(--success-bg); color: var(--success-text); }
         .b-optional { background: var(--neutral-bg); color: var(--neutral-text); }
 
-        .action-area { position: sticky; bottom: 2rem; background: var(--surface); padding: 1.5rem; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 1rem; z-index: 100; }
-        .btn-generate { padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-        .btn-generate:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-generate:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.8; }
-        .error-box { background: var(--danger-bg); color: var(--danger-text); border: 1px solid #f87171; padding: 1rem; border-radius: 10px; font-size: 0.9rem; }
-        .icon-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 6px; }
-        .icon-btn:hover { background: var(--danger-bg); color: var(--danger-text); }
-
-        /* --- BONUS FEATURES STYLES --- */
-        .bonus-card { border: 1px dashed #a5b4fc; background: #fefeff; }
+        /* Advanced Widgets (Bonus) */
+        .bonus-card { background: #F8FAFC; border: 2px dashed #C7D2FE; }
         .bonus-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-        .bonus-box { padding: 1.5rem; background: var(--neutral-bg); border-radius: 12px; border: 1px solid var(--border); }
-        .bonus-box h4 { margin-bottom: 1rem; color: #4338ca; font-size: 0.95rem; }
-        .btn-bonus { width: 100%; padding: 0.6rem; margin-bottom: 0.5rem; background: white; border: 1px solid var(--border); border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.85rem;}
-        .btn-bonus:hover { border-color: var(--primary); color: var(--primary); }
+        .bonus-box { padding: 1.5rem; background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .bonus-box h4 { margin-bottom: 1.25rem; color: var(--text-main); font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;}
+        .btn-bonus { width: 100%; padding: 0.75rem; margin-bottom: 0.75rem; background: var(--surface); border: 2px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; color: var(--text-muted);}
+        .btn-bonus:hover { border-color: var(--primary); color: var(--primary); background: #EEF2FF; }
+        .btn-ai-glow { background: linear-gradient(135deg, #10B981, #059669); border: none; color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+        .btn-ai-glow:hover { background: linear-gradient(135deg, #059669, #047857); color: white; transform: translateY(-1px); }
 
+        /* Glassmorphism Action Area */
+        .action-area { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1000px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 1.25rem 2rem; border-radius: 100px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        .action-content { display: flex; align-items: center; gap: 1.5rem; width: 100%; }
+        .error-box { background: var(--danger-bg); color: var(--danger-text); padding: 0.75rem 1.5rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600; flex: 1; display: flex; align-items: center; border: 1px solid #FECACA; }
+        
+        .btn-generate { padding: 1rem 2.5rem; background: var(--primary-gradient); color: white; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); white-space: nowrap; margin-left: auto; }
+        .btn-generate:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.5); }
+        .btn-generate:disabled { background: #94A3B8; cursor: not-allowed; box-shadow: none; transform: none; }
+        
+        .icon-btn { background: #F1F5F9; border: none; color: var(--text-muted); cursor: pointer; padding: 0.6rem; border-radius: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .icon-btn:hover { background: var(--danger-bg); color: var(--danger-text); }
+        
         #workspace-area { display: none; }
         #json-upload-area { display: block; }
     </style>
@@ -98,35 +130,40 @@
     <header class="app-header">
         <div>
             <h1 class="app-title" id="app-title">Tender Package Builder</h1>
-            <p class="app-subtitle">Developer: Mahmud Al-Hadi (251-35-505) | AI DevFest 2026</p>
+            <p class="app-subtitle">Developer: Mahmud Al-Hadi (251-35-505) | Enterprise Vibe</p>
         </div>
         <div class="btn-group">
-            <button class="btn-outline btn-reset" onclick="hardReset()" id="btn-reset">Reset All Data</button>
+            <button class="btn-outline btn-reset" onclick="hardReset()" id="btn-reset">Reset Workspace</button>
             <button class="btn-outline" onclick="toggleLanguage()" id="btn-lang">বাংলায় দেখুন</button>
         </div>
     </header>
 
-    <!-- Task 4.1: Load JSON Area -->
+    <!-- STEP 1: JSON Upload -->
     <div class="card" id="json-upload-area">
         <div class="card-header">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-            <span id="title-load-json">Step 1: Load Requirements</span>
+            <div class="icon-wrapper">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+            </div>
+            <span id="title-load-json">Step 1: Database Initialization</span>
         </div>
         <div class="upload-zone json-upload-zone">
             <input type="file" accept="application/json" onchange="handleJsonUpload(event)">
-            <svg class="upload-icon" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            <h3 id="json-hint" style="margin-bottom: 0.5rem; font-size: 1.5rem;">Upload requirements.json</h3>
-            <p id="json-subhint" style="color: var(--text-muted);">Please select the requirements.json file.</p>
+            <svg class="upload-icon" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <h3 id="json-hint" style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 800; color: #1E293B;">Upload requirements.json</h3>
+            <p id="json-subhint" style="color: var(--text-muted); font-weight: 500;">Provide the tender JSON data schema to configure the workspace.</p>
         </div>
     </div>
 
-    <!-- Workspace Area -->
+    <!-- WORKSPACE (Step 2 onwards) -->
     <div id="workspace-area">
+        
         <!-- Tender Details -->
         <div class="card">
             <div class="card-header">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span id="title-tender">Tender Information</span>
+                <div class="icon-wrapper">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <span id="title-tender">Tender Specification</span>
             </div>
             <div class="info-grid" id="tender-details"></div>
         </div>
@@ -134,14 +171,16 @@
         <!-- Task 4.2: Upload PDFs -->
         <div class="card">
             <div class="card-header">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                <span id="title-upload">Upload Documents</span>
+                <div class="icon-wrapper">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                </div>
+                <span id="title-upload">Document Repository (PDF Only)</span>
             </div>
             <div class="upload-zone">
                 <input type="file" accept="application/pdf" multiple onchange="handlePdfUpload(event)">
-                <svg class="upload-icon" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                <h3 id="upload-hint" style="margin-bottom: 0.5rem;">Click or drag PDF files here</h3>
-                <p id="upload-subhint" style="color: var(--text-muted); font-size: 0.875rem;">Upload multiple PDF files. Damaged/Encrypted files will be rejected safely.</p>
+                <svg class="upload-icon" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                <h3 id="upload-hint" style="margin-bottom: 0.5rem; font-weight: 700;">Drop PDF files here or click to browse</h3>
+                <p id="upload-subhint" style="color: var(--text-muted); font-size: 0.9rem;">Encrypted or corrupted files will be automatically filtered safely.</p>
             </div>
             <div class="file-list" id="uploaded-files-list"></div>
         </div>
@@ -149,8 +188,10 @@
         <!-- Task 4.3 & 4.4: Match & Expiry -->
         <div class="card">
             <div class="card-header">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                <span id="title-match">Match Requirements</span>
+                <div class="icon-wrapper">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                </div>
+                <span id="title-match">Requirement Mapping</span>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -159,7 +200,7 @@
                             <th id="th-req" style="width: 35%">Requirement</th>
                             <th id="th-file" style="width: 30%">Matched File</th>
                             <th id="th-expiry" style="width: 20%">Expiry Date</th>
-                            <th id="th-status" style="width: 15%">Status</th>
+                            <th id="th-status" style="width: 15%">Validation</th>
                         </tr>
                     </thead>
                     <tbody id="requirements-body"></tbody>
@@ -169,60 +210,64 @@
 
         <!-- BONUS TASKS SECTION (Section 7) -->
         <div class="card bonus-card">
-            <div class="card-header" style="color: #6366f1;">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-                <span>Advanced Tools & Bonus Features</span>
+            <div class="card-header" style="border-bottom-color: #C7D2FE;">
+                <div class="icon-wrapper" style="background: var(--primary); color: white;">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <span>Advanced Tools & AI Features</span>
             </div>
             
             <div class="bonus-grid">
                 <!-- Data & Project -->
                 <div class="bonus-box">
-                    <h4>Data & Export</h4>
-                    <button class="btn-bonus" onclick="exportCSV()">Download Checklist (CSV)</button>
-                    <button class="btn-bonus" onclick="exportProject()">Export Project File</button>
+                    <h4><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Data Operations</h4>
+                    <button class="btn-bonus" onclick="exportCSV()">Download Meta-Checklist (CSV)</button>
+                    <button class="btn-bonus" onclick="exportProject()">Export Workspace Backup (.json)</button>
                     <label class="btn-bonus" style="text-align: center; cursor: pointer; display:block;">
-                        Import Project <input type="file" style="display:none" accept=".json" onchange="importProject(event)">
+                        Import Workspace <input type="file" style="display:none" accept=".json" onchange="importProject(event)">
                     </label>
                 </div>
                 
                 <!-- Matching -->
                 <div class="bonus-box">
-                    <h4>Smart Matching</h4>
-                    <button class="btn-bonus" onclick="autoMatch()">Basic Auto-Match (Name)</button>
-                    <div style="margin-top: 10px;">
-                        <input type="text" id="ai-api-key" placeholder="Enter Gemini API Key" style="margin-bottom: 5px;">
-                        <button class="btn-bonus" style="background:#4f46e5; color:white;" onclick="aiAutoMatch()" id="btn-ai">✨ AI Auto-Match</button>
+                    <h4><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Smart Allocation</h4>
+                    <button class="btn-bonus" onclick="autoMatch()">Basic Heuristic Match</button>
+                    <div style="margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 10px;">
+                        <input type="text" id="ai-api-key" placeholder="Enter Gemini API Key..." style="margin-bottom: 8px; padding:0.6rem; font-size:0.85rem;">
+                        <button class="btn-bonus btn-ai-glow" onclick="aiAutoMatch()" id="btn-ai">✨ AI Deep Match</button>
                     </div>
                 </div>
 
                 <!-- Document Stamp -->
                 <div class="bonus-box">
-                    <h4>Seal / Signature</h4>
+                    <h4><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg> Seal Integration</h4>
                     <label class="btn-bonus" style="text-align: center; cursor: pointer; display:block;">
-                        Upload PNG Seal <input type="file" style="display:none" accept="image/png" id="seal-upload" onchange="handleSealUpload(event)">
+                        Upload PNG Signature <input type="file" style="display:none" accept="image/png" id="seal-upload" onchange="handleSealUpload(event)">
                     </label>
-                    <div id="seal-status" style="font-size: 0.8rem; color: var(--success-text); margin-top: 5px;"></div>
-                    <select id="seal-placement" style="margin-top: 10px; font-size: 0.8rem; padding: 0.4rem;">
-                        <option value="none">Don't Apply Seal</option>
-                        <option value="cover">Apply to Cover & Index</option>
-                        <option value="all" selected>Apply to All Pages</option>
+                    <div id="seal-status" style="font-size: 0.8rem; color: var(--success-text); margin-top: 5px; font-weight: 600;"></div>
+                    <select id="seal-placement" style="margin-top: 10px; font-size: 0.85rem; padding: 0.6rem;">
+                        <option value="none">Disable Seal Rendering</option>
+                        <option value="cover">Render on Cover & Index</option>
+                        <option value="all" selected>Render Across All Pages</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <!-- Task 4.7 & 4.8: Make Package -->
-        <div class="action-area">
+    </div>
+
+    <!-- Floating Action Dock -->
+    <div class="action-area">
+        <div class="action-content">
             <div class="error-box" id="blocking-errors" style="display: none;"></div>
             <button class="btn-generate" id="btn-generate" onclick="generatePackage()" disabled>
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span id="btn-gen-text">Generate Package</span>
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span id="btn-gen-text">Compile Final Package</span>
             </button>
         </div>
     </div>
 </div>
 
-<!-- JavaScript Logic Embedded Directly -->
 <script>
     let currentLang = 'en'; 
     let tenderData = null; 
@@ -232,7 +277,7 @@
     let expiries = {}; 
     let customSealBase64 = null; 
 
-    // --- Base64 Converters for Storage ---
+    // --- Base64 Converters for Safe Storage ---
     function abToBase64(buffer) {
         let binary = ''; const bytes = new Uint8Array(buffer);
         for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
@@ -246,7 +291,7 @@
         return bytes.buffer;
     }
 
-    // --- Persistence ---
+    // --- Core Memory Persistence ---
     function saveState() {
         try {
             if(tenderData) localStorage.setItem('v_data', JSON.stringify(tenderData));
@@ -259,7 +304,7 @@
                 id: f.id, name: f.name, pages: f.pages, isDuplicate: f.isDuplicate, base64: abToBase64(f.buffer)
             }));
             localStorage.setItem('v_files', JSON.stringify(filesData));
-        } catch(e) { console.warn("Storage limits exceeded."); }
+        } catch(e) { console.warn("Storage limits exceeded. Working purely in RAM."); }
     }
 
     function loadState() {
@@ -268,7 +313,7 @@
             const rq = localStorage.getItem('v_reqs'); if(rq) requirements = JSON.parse(rq);
             const mt = localStorage.getItem('v_match'); if(mt) matches = JSON.parse(mt);
             const ex = localStorage.getItem('v_exp'); if(ex) expiries = JSON.parse(ex);
-            const seal = localStorage.getItem('v_seal'); if(seal) { customSealBase64 = seal; document.getElementById('seal-status').innerText = "Seal Loaded!"; }
+            const seal = localStorage.getItem('v_seal'); if(seal) { customSealBase64 = seal; document.getElementById('seal-status').innerText = "Active ✓"; }
             
             const fl = localStorage.getItem('v_files');
             if(fl) {
@@ -283,34 +328,34 @@
     window.onload = () => loadState();
 
     function hardReset() {
-        if(confirm("Reset all data and clear uploaded files?")) {
+        if(confirm("Factory reset? All local configurations and files will be permanently erased.")) {
             tenderData = null; requirements = []; matches = {}; expiries = {}; uploadedFiles = []; customSealBase64 = null;
             localStorage.clear(); renderApp();
         }
     }
 
-    // --- Main Tasks: Uploads ---
+    // --- Core Handlers ---
     async function handleJsonUpload(event) {
         const file = event.target.files[0]; if (!file) return;
         try {
             const text = await file.text(); const data = JSON.parse(text);
-            if(!data.tender || !data.requirements) { alert("Invalid format! Expected 'tender' and 'requirements'."); return; }
+            if(!data.tender || !data.requirements) { alert("Invalid schema. Expected 'tender' and 'requirements' entities."); return; }
             tenderData = data.tender; requirements = data.requirements;
             saveState(); renderApp();
-        } catch (error) { alert("Error reading JSON file."); }
+        } catch (error) { alert("Failed parsing JSON schema."); }
     }
 
     async function handlePdfUpload(event) {
         for (let file of event.target.files) {
-            if (file.type !== "application/pdf") { alert(`Rejected: ${file.name} is not a PDF.`); continue; }
+            if (file.type !== "application/pdf") continue;
             const buffer = await file.arrayBuffer(); let pages = 0;
             
             try { 
                 const pdf = await PDFLib.PDFDocument.load(buffer, { ignoreEncryption: true }); 
-                if(pdf.isEncrypted) throw new Error("Password Protected");
+                if(pdf.isEncrypted) throw new Error("Encrypted");
                 pages = pdf.getPageCount(); 
             } catch(e) { 
-                alert(`Skipped ${file.name}: The PDF is damaged or Password Protected. Please upload a clear file.`); 
+                alert(`Security Filter Triggered: [${file.name}] is damaged or encrypted.`); 
                 continue; 
             }
             
@@ -354,35 +399,24 @@
     function updateMatch(reqId, val) { if(!val){ delete matches[reqId]; delete expiries[reqId]; } else matches[reqId] = val; saveState(); renderApp(); }
     function updateExpiry(reqId, val) { expiries[reqId] = val; saveState(); renderApp(); }
 
-    // --- BONUS TASKS LOGIC ---
+    // --- Bonus Features ---
     function exportCSV() {
-        if(!requirements.length) return alert("No requirements loaded.");
+        if(!requirements.length) return;
         let csvContent = "data:text/csv;charset=utf-8,Requirement,Matched File Name,Pages,Expiry Date,Status\n";
         requirements.sort((a,b) => a.order - b.order).forEach(req => {
             const file = uploadedFiles.find(f => f.id === matches[req.id]);
-            const fName = file ? `"${file.name}"` : "None";
-            const fPages = file ? file.pages : 0;
-            const exp = (req.has_expiry && matches[req.id] && expiries[req.id]) ? expiries[req.id] : "N/A";
-            const stat = getStatus(req).code;
-            csvContent += `"${req.title_en}",${fName},${fPages},${exp},${stat}\n`;
+            csvContent += `"${req.title_en}",${file ? `"${file.name}"` : "None"},${file ? file.pages : 0},${(req.has_expiry && matches[req.id] && expiries[req.id]) ? expiries[req.id] : "N/A"},${getStatus(req).code}\n`;
         });
-        const link = document.createElement("a");
-        link.setAttribute("href", encodeURI(csvContent));
-        link.setAttribute("download", `${tenderData ? tenderData.tender_id : 'Tender'}_Checklist.csv`);
-        link.click();
+        const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent));
+        link.setAttribute("download", `${tenderData ? tenderData.tender_id : 'Tender'}_Audit.csv`); link.click();
     }
 
     function exportProject() {
-        if(!tenderData) return alert("Nothing to export.");
+        if(!tenderData) return;
         saveState(); 
-        const projectData = {
-            v_data: localStorage.getItem('v_data'), v_reqs: localStorage.getItem('v_reqs'),
-            v_match: localStorage.getItem('v_match'), v_exp: localStorage.getItem('v_exp'),
-            v_files: localStorage.getItem('v_files'), v_seal: localStorage.getItem('v_seal')
-        };
-        const blob = new Blob([JSON.stringify(projectData)], {type: "application/json"});
+        const blob = new Blob([JSON.stringify({ v_data: localStorage.getItem('v_data'), v_reqs: localStorage.getItem('v_reqs'), v_match: localStorage.getItem('v_match'), v_exp: localStorage.getItem('v_exp'), v_files: localStorage.getItem('v_files'), v_seal: localStorage.getItem('v_seal') })], {type: "application/json"});
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
-        link.download = `${tenderData.tender_id}_ProjectBackup.json`; link.click();
+        link.download = `${tenderData.tender_id}_Workspace.json`; link.click();
     }
 
     function importProject(event) {
@@ -391,14 +425,9 @@
         reader.onload = (e) => {
             try {
                 const data = JSON.parse(e.target.result);
-                if(data.v_data) localStorage.setItem('v_data', data.v_data);
-                if(data.v_reqs) localStorage.setItem('v_reqs', data.v_reqs);
-                if(data.v_match) localStorage.setItem('v_match', data.v_match);
-                if(data.v_exp) localStorage.setItem('v_exp', data.v_exp);
-                if(data.v_files) localStorage.setItem('v_files', data.v_files);
-                if(data.v_seal) localStorage.setItem('v_seal', data.v_seal);
-                loadState(); alert("Project Imported Successfully!");
-            } catch(err) { alert("Invalid Project File."); }
+                Object.keys(data).forEach(k => { if(data[k]) localStorage.setItem(k, data[k]); });
+                loadState(); alert("Workspace synced successfully.");
+            } catch(err) { alert("Corrupted workspace file."); }
         };
         reader.readAsText(file);
     }
@@ -413,18 +442,17 @@
             }
         });
         saveState(); renderApp();
-        alert(`Auto-matched ${matchedCount} documents!`);
     }
 
     async function aiAutoMatch() {
         const apiKey = document.getElementById('ai-api-key').value;
-        if(!apiKey) return alert("Please enter your Gemini API Key first.");
-        const btn = document.getElementById('btn-ai'); btn.innerText = "Thinking..."; btn.disabled = true;
+        if(!apiKey) return alert("Gemini API Key Required.");
+        const btn = document.getElementById('btn-ai'); btn.innerText = "Analyzing Context..."; btn.disabled = true;
         
         const unmatchedReqs = requirements.filter(r => !matches[r.id]).map(r => ({id: r.id, name: r.title_en}));
         const availableFiles = uploadedFiles.filter(f => !f.isDuplicate && !Object.values(matches).includes(f.id)).map(f => ({id: f.id, name: f.name}));
         
-        if(!unmatchedReqs.length || !availableFiles.length) { btn.innerText = "✨ AI Auto-Match"; btn.disabled = false; return alert("Nothing to match."); }
+        if(!unmatchedReqs.length || !availableFiles.length) { btn.innerText = "✨ AI Deep Match"; btn.disabled = false; return; }
 
         const prompt = `Match these files to requirements based on names. Requirements: ${JSON.stringify(unmatchedReqs)}. Files: ${JSON.stringify(availableFiles)}. Return strictly valid JSON array of objects with 'reqId' and 'fileId'. No markdown.`;
 
@@ -434,14 +462,11 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
             const data = await response.json();
-            const resultText = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
-            const aiMatches = JSON.parse(resultText);
-            
-            let count = 0;
-            aiMatches.forEach(m => { if(m.reqId && m.fileId) { matches[m.reqId] = m.fileId; count++; } });
-            saveState(); renderApp(); alert(`AI Matched ${count} documents!`);
-        } catch(e) { alert("AI Matching Failed. Check API Key."); }
-        btn.innerText = "✨ AI Auto-Match"; btn.disabled = false;
+            const aiMatches = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim());
+            aiMatches.forEach(m => { if(m.reqId && m.fileId) { matches[m.reqId] = m.fileId; } });
+            saveState(); renderApp();
+        } catch(e) { alert("AI Service Unreachable."); }
+        btn.innerText = "✨ AI Deep Match"; btn.disabled = false;
     }
 
     function handleSealUpload(event) {
@@ -449,15 +474,15 @@
         const reader = new FileReader();
         reader.onload = (e) => {
             customSealBase64 = e.target.result;
-            document.getElementById('seal-status').innerText = "Seal Loaded! (" + file.name + ")";
+            document.getElementById('seal-status').innerText = "Active ✓";
             saveState();
         };
         reader.readAsDataURL(file);
     }
 
-    // --- Main Rendering ---
+    // --- UI Render ---
     function renderApp() {
-        const t = currentLang === 'en' ? { appTitle: "Tender Package Builder", btnLang: "বাংলায় দেখুন", jsonLoad: "Step 1: Load Requirements", thReq: "Requirement", thFile: "Matched File", thExpiry: "Expiry Date", thStatus: "Status", btnGen: "Generate Package", missing: "Missing", expiryNeeded: "Expiry date needed", expired: "Expired", notProvided: "Not provided", ok: "OK", optional: "Optional" } : { appTitle: "দরপত্র প্যাকেজ নির্মাতা", btnLang: "View in English", jsonLoad: "ধাপ ১: প্রয়োজনীয়তা লোড করুন", thReq: "প্রয়োজনীয়তা", thFile: "ফাইল", thExpiry: "মেয়াদ", thStatus: "অবস্থা", btnGen: "প্যাকেজ তৈরি করুন", missing: "অনুপস্থিত", expiryNeeded: "তারিখ প্রয়োজন", expired: "মেয়াদোত্তীর্ণ", notProvided: "দেওয়া হয়নি", ok: "সঠিক", optional: "ঐচ্ছিক" };
+        const t = currentLang === 'en' ? { appTitle: "Tender Package Builder", btnLang: "বাংলায় দেখুন", jsonLoad: "Step 1: Database Initialization", thReq: "Requirement", thFile: "Matched File", thExpiry: "Expiry Date", thStatus: "Validation", btnGen: "Compile Final Package", missing: "Missing", expiryNeeded: "Expiry Needed", expired: "Expired", notProvided: "Not provided", ok: "Validated", optional: "Optional" } : { appTitle: "দরপত্র প্যাকেজ নির্মাতা", btnLang: "View in English", jsonLoad: "ধাপ ১: ডেটাবেস ইনিশিয়ালাইজেশন", thReq: "প্রয়োজনীয়তা", thFile: "ফাইল", thExpiry: "মেয়াদ", thStatus: "অবস্থা", btnGen: "চূড়ান্ত প্যাকেজ তৈরি করুন", missing: "অনুপস্থিত", expiryNeeded: "তারিখ প্রয়োজন", expired: "মেয়াদোত্তীর্ণ", notProvided: "দেওয়া হয়নি", ok: "সঠিক", optional: "ঐচ্ছিক" };
 
         document.getElementById('app-title').innerText = t.appTitle; document.getElementById('btn-lang').innerText = t.btnLang;
         
@@ -473,20 +498,20 @@
         document.getElementById('btn-gen-text').innerText = t.btnGen;
 
         document.getElementById('tender-details').innerHTML = `
-            <div class="info-item"><span class="info-label">Tender ID</span><span class="info-value">${tenderData.tender_id}</span></div>
-            <div class="info-item"><span class="info-label">Title</span><span class="info-value">${tenderData.title}</span></div>
+            <div class="info-item"><span class="info-label">Tender Reference</span><span class="info-value">${tenderData.tender_id}</span></div>
+            <div class="info-item"><span class="info-label">Project Title</span><span class="info-value">${tenderData.title}</span></div>
             <div class="info-item"><span class="info-label">Procuring Entity</span><span class="info-value">${tenderData.procuring_entity}</span></div>
-            <div class="info-item"><span class="info-label">Bidder</span><span class="info-value">${tenderData.bidder}</span></div>
-            <div class="info-item"><span class="info-label">Deadline</span><span class="info-value" style="color:var(--primary); font-weight:700;">${tenderData.submission_deadline}</span></div>
+            <div class="info-item"><span class="info-label">Filing Organization</span><span class="info-value">${tenderData.bidder}</span></div>
+            <div class="info-item"><span class="info-label">Strict Deadline</span><span class="info-value" style="color:var(--primary); font-weight:800;">${tenderData.submission_deadline}</span></div>
         `;
 
         document.getElementById('uploaded-files-list').innerHTML = uploadedFiles.map(f => `
             <div class="file-card">
                 <div class="file-detail">
                     <span class="file-name" title="${f.name}">${f.name}</span><span class="file-meta">${f.pages} pages</span>
-                    ${f.isDuplicate ? `<span class="badge-duplicate">Duplicate Content Detected</span>` : ''}
+                    ${f.isDuplicate ? `<span class="badge-duplicate">Duplicate Content Triggered</span>` : ''}
                 </div>
-                <button class="icon-btn" onclick="removeFile('${f.id}')">✖</button>
+                <button class="icon-btn" onclick="removeFile('${f.id}')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
         `).join('');
 
@@ -496,9 +521,9 @@
         requirements.sort((a, b) => a.order - b.order).forEach(req => {
             const stat = getStatus(req);
             const reqTitle = currentLang === 'en' ? req.title_en : (req.title_bn || req.title_en);
-            if (stat.block) { hasError = true; errorList.push(`${reqTitle}: ${t[stat.code]}`); }
+            if (stat.block) { hasError = true; errorList.push(`[${reqTitle}]: ${t[stat.code]}`); }
 
-            let opts = `<option value="">-- Select File --</option>`;
+            let opts = `<option value="">-- Select File Resource --</option>`;
             uploadedFiles.forEach(f => {
                 const usedByOther = Object.values(matches).includes(f.id) && matches[req.id] !== f.id;
                 if (!f.isDuplicate && !usedByOther) opts += `<option value="${f.id}" ${matches[req.id] === f.id ? 'selected' : ''}>${f.name}</option>`;
@@ -513,7 +538,7 @@
 
             tbody.innerHTML += `
                 <tr>
-                    <td><div style="font-weight:600;">${req.order}. ${reqTitle} ${!req.mandatory ? `<span style="font-size:0.75rem;color:gray;">(${t.optional})</span>` : ''}</div></td>
+                    <td><div style="font-weight:700; color:#1E293B;">${req.order}. ${reqTitle} ${!req.mandatory ? `<span style="font-size:0.75rem;color:var(--text-muted); font-weight:600;">(${t.optional})</span>` : ''}</div></td>
                     <td><select onchange="updateMatch('${req.id}', this.value)">${opts}</select></td>
                     <td>${dateInput}</td>
                     <td><div class="badge ${stat.css}">${t[stat.code]}</div></td>
@@ -524,16 +549,16 @@
         if (hasError || requirements.length === 0) {
             btnGen.disabled = true; 
             if(requirements.length > 0) {
-                errBox.style.display = 'block'; errBox.innerHTML = `<strong>Action Required:</strong><ul style="margin-top:0.5rem; margin-left:1.2rem;"><li>${errorList.join('</li><li>')}</li></ul>`;
+                errBox.style.display = 'flex'; errBox.innerHTML = `<span style="margin-right:10px;">⚠️</span> Compilation Blocked: Resolve ${errorList.length} conflict(s).`;
             } else { errBox.style.display = 'none'; }
         } else { btnGen.disabled = false; errBox.style.display = 'none'; }
     }
 
     function toggleLanguage() { currentLang = currentLang === 'en' ? 'bn' : 'en'; renderApp(); }
 
-    // --- PACKAGE GENERATION ---
+    // --- COMPILE PDF ---
     async function generatePackage() {
-        const btnText = document.getElementById('btn-gen-text'); btnText.innerText = "Processing Document..."; document.getElementById('btn-generate').disabled = true;
+        const btnText = document.getElementById('btn-gen-text'); btnText.innerText = "Processing Render..."; document.getElementById('btn-generate').disabled = true;
         try {
             const { PDFDocument, rgb, StandardFonts } = PDFLib; 
             const finalDoc = await PDFDocument.create();
@@ -545,22 +570,18 @@
             const banglaFont = await finalDoc.embedFont(banglaBytes);
             const activeFont = currentLang === 'bn' ? banglaFont : engFont;
 
-            let pngSeal = null;
-            if(customSealBase64) pngSeal = await finalDoc.embedPng(customSealBase64);
+            let pngSeal = null; if(customSealBase64) pngSeal = await finalDoc.embedPng(customSealBase64);
             const sealMode = document.getElementById('seal-placement').value;
 
-            // Cover Page
-            const cvr = finalDoc.addPage(); 
-            let y = cvr.getSize().height - 80;
+            const cvr = finalDoc.addPage(); let y = cvr.getSize().height - 100;
             const write = (txt, sz, fnt, gap) => { cvr.drawText(txt, { x: 50, y, size: sz, font: fnt }); y -= gap; };
 
-            write(currentLang === 'en' ? "TENDER DOCUMENT PACKAGE" : "দরপত্র নথি প্যাকেজ", 22, activeFont, 40);
-            write(`Tender ID: ${tenderData.tender_id}`, 12, engFont, 25); write(`Title: ${tenderData.title}`, 12, engFont, 25);
-            write(`Procuring Entity: ${tenderData.procuring_entity}`, 12, engFont, 25); write(`Bidder: ${tenderData.bidder}`, 12, engFont, 25);
-            write(`Submission Deadline: ${tenderData.submission_deadline}`, 12, engFont, 25); write(`Date Generated: ${new Date().toISOString().split('T')[0]}`, 12, engFont, 50);
+            write(currentLang === 'en' ? "TENDER DOCUMENT PACKAGE" : "দরপত্র নথি প্যাকেজ", 26, activeFont, 50);
+            write(`Tender ID: ${tenderData.tender_id}`, 14, engFont, 30); write(`Title: ${tenderData.title}`, 14, engFont, 30);
+            write(`Procuring Entity: ${tenderData.procuring_entity}`, 14, engFont, 30); write(`Bidder: ${tenderData.bidder}`, 14, engFont, 30);
+            write(`Submission Deadline: ${tenderData.submission_deadline}`, 14, engFont, 30); write(`Date Generated: ${new Date().toISOString().split('T')[0]}`, 14, engFont, 60);
 
-            let pageCounter = 3; 
-            const indexData = [];
+            let pageCounter = 3; const indexData = [];
             const sortedReqs = [...requirements].sort((a,b) => a.order - b.order);
             for (const req of sortedReqs) {
                 if (matches[req.id]) {
@@ -571,17 +592,14 @@
                 }
             }
 
-            // Index Page
-            const indexPg = finalDoc.addPage();
-            let idxY = indexPg.getSize().height - 80;
-            indexPg.drawText(currentLang === 'en' ? "INDEX" : "সূচিপত্র", { x: 50, y: idxY, size: 20, font: activeFont }); idxY -= 40;
+            const indexPg = finalDoc.addPage(); let idxY = indexPg.getSize().height - 100;
+            indexPg.drawText(currentLang === 'en' ? "INDEX" : "সূচিপত্র", { x: 50, y: idxY, size: 22, font: activeFont }); idxY -= 50;
             indexData.forEach(item => {
-                indexPg.drawText(item.title, { x: 50, y: idxY, size: 12, font: activeFont });
-                indexPg.drawText(`Page ${item.start}`, { x: 450, y: idxY, size: 12, font: engFont });
-                idxY -= 25;
+                indexPg.drawText(item.title, { x: 50, y: idxY, size: 14, font: activeFont });
+                indexPg.drawText(`Page ${item.start}`, { x: 450, y: idxY, size: 14, font: engFont });
+                idxY -= 30;
             });
 
-            // Documents
             for (const req of sortedReqs) {
                 if (matches[req.id]) {
                     const f = uploadedFiles.find(x => x.id === matches[req.id]);
@@ -591,25 +609,24 @@
                 }
             }
 
-            // Footers & Seal
             const tPages = finalDoc.getPageCount(); const pages = finalDoc.getPages();
             for (let i = 0; i < tPages; i++) {
                 const p = pages[i]; const w = p.getSize().width;
-                p.drawRectangle({ x: 0, y: 10, width: w, height: 25, color: rgb(1, 1, 1) });
-                p.drawText(`${tenderData.tender_id} | Page ${i+1} of ${tPages}`, { x: w/2 - 60, y: 18, size: 10, font: engFont });
+                p.drawRectangle({ x: 0, y: 15, width: w, height: 30, color: rgb(1, 1, 1) });
+                p.drawText(`${tenderData.tender_id} | Page ${i+1} of ${tPages}`, { x: w/2 - 60, y: 25, size: 11, font: engFont });
 
                 if(pngSeal) {
                     const isCoverOrIndex = (i === 0 || i === 1);
                     if (sealMode === 'all' || (sealMode === 'cover' && isCoverOrIndex)) {
-                        p.drawImage(pngSeal, { x: w - 150, y: 50, width: 100, height: 50, opacity: 0.8 });
+                        p.drawImage(pngSeal, { x: w - 160, y: 60, width: 120, height: 60, opacity: 0.85 });
                     }
                 }
             }
 
             const blob = new Blob([await finalDoc.save()], { type: 'application/pdf' }); 
             const lnk = document.createElement('a'); lnk.href = URL.createObjectURL(blob); lnk.download = `${tenderData.tender_id}_Package.pdf`; lnk.click();
-        } catch (e) { alert("Error generating PDF. Please check your files."); console.error(e); } 
-        finally { btnText.innerText = currentLang === 'en' ? "Generate Package" : "প্যাকেজ তৈরি করুন"; document.getElementById('btn-generate').disabled = false; renderApp(); }
+        } catch (e) { alert("Compilation Failed."); } 
+        finally { btnText.innerText = currentLang === 'en' ? "Compile Final Package" : "চূড়ান্ত প্যাকেজ তৈরি করুন"; document.getElementById('btn-generate').disabled = false; renderApp(); }
     }
 </script>
 
