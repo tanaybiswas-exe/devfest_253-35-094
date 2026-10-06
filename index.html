@@ -42,6 +42,7 @@
         .toast { min-width: 300px; background: var(--bg-surface); border-left: 4px solid var(--brand-primary); box-shadow: var(--shadow-lg); padding: 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px; animation: slideInRight 0.3s ease forwards; color: var(--text-main); font-weight: 500; font-size: 0.9rem;}
         .toast.error { border-color: var(--danger); }
         .toast.success { border-color: var(--success); }
+        .toast.warning { border-color: var(--warning); }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; } }
 
@@ -305,7 +306,7 @@
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         
-        const icon = type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-exclamation"></i>';
+        const icon = type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : (type === 'error' ? '<i class="fa-solid fa-circle-exclamation"></i>' : '<i class="fa-solid fa-triangle-exclamation"></i>');
         toast.innerHTML = `${icon} <span>${message}</span>`;
         
         container.appendChild(toast);
@@ -386,7 +387,7 @@
         if(tenderData) {
             document.getElementById('zone-json').classList.add('hidden');
             document.getElementById('tender-info-box').classList.remove('hidden');
-            switchTab(2); // Auto jump to step 2 if data exists
+            switchTab(2); 
         }
         checkDuplicates(); renderApp();
     }
@@ -420,6 +421,10 @@
             document.getElementById('tender-info-box').classList.remove('hidden');
             showToast("Project Initialized Successfully!");
             renderApp();
+            
+            // Auto Navigate to Step 2 after successful JSON load
+            setTimeout(() => switchTab(2), 500); 
+            
         } catch (error) { showToast("Failed parsing JSON schema.", "error"); }
     }
 
