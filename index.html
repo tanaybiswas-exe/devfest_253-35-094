@@ -3,272 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tender Package Builder | Enterprise Edition</title>
+    <title>TenderX | Enterprise Package Builder</title>
     
-    <!-- External Libraries -->
+    <!-- Libraries -->
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.js"></script>
-    
-    <!-- Modern Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Professional Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Premium Color Palette */
-            --primary: #4F46E5; 
-            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
-            --bg-color: #F8FAFC; 
-            --surface: #FFFFFF;
-            --text-main: #0F172A; 
+            --brand-primary: #4F46E5;
+            --brand-secondary: #818CF8;
+            --brand-dark: #1E1B4B;
+            --bg-body: #F1F5F9;
+            --bg-surface: #FFFFFF;
+            --text-main: #0F172A;
             --text-muted: #64748B;
-            --border: #E2E8F0; 
-            --border-hover: #CBD5E1;
-            
-            /* Status Colors */
-            --success-bg: #ECFDF5; --success-text: #059669;
-            --danger-bg: #FEF2F2; --danger-text: #DC2626;
-            --warning-bg: #FFFBEB; --warning-text: #D97706;
-            --neutral-bg: #F1F5F9; --neutral-text: #475569;
-
-            --radius-lg: 20px;
+            --border-color: #E2E8F0;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             --radius-md: 12px;
-            --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.06);
+            --radius-lg: 16px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 2rem; }
-        .container { max-width: 1200px; margin: 0 auto; padding-bottom: 6rem; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        h1, h2, h3, h4, h5 { font-family: 'Outfit', sans-serif; }
 
-        /* App Header */
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: var(--surface); padding: 1.5rem 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.5); }
-        .app-title { font-size: 1.75rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .app-subtitle { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; margin-top: 0.25rem; }
-        .btn-group { display: flex; gap: 1rem; }
-        
-        /* Buttons */
-        .btn-outline { padding: 0.6rem 1.25rem; background: white; border: 2px solid var(--border); border-radius: var(--radius-md); font-weight: 600; color: var(--text-main); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .btn-outline:hover { background: var(--neutral-bg); border-color: var(--border-hover); transform: translateY(-1px); }
-        .btn-reset { color: var(--danger-text); border-color: #FECACA; background: #FEF2F2;}
-        .btn-reset:hover { background: #FEE2E2; border-color: #F87171; }
+        /* --- Toast Notifications --- */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { min-width: 300px; background: var(--bg-surface); border-left: 4px solid var(--brand-primary); box-shadow: var(--shadow-lg); padding: 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px; animation: slideInRight 0.3s ease forwards; color: var(--text-main); font-weight: 500; font-size: 0.9rem;}
+        .toast.error { border-color: var(--danger); }
+        .toast.success { border-color: var(--success); }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; } }
 
-        /* Card Layout */
-        .card { background: var(--surface); border-radius: var(--radius-lg); padding: 2.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-soft); border: 1px solid rgba(226, 232, 240, 0.6); transition: transform 0.3s ease; }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 15px 40px -10px rgba(0,0,0,0.08); }
-        .card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; font-size: 1.35rem; font-weight: 700; color: var(--text-main); border-bottom: 2px solid var(--neutral-bg); padding-bottom: 1.25rem; }
-        .icon-wrapper { background: #EEF2FF; color: var(--primary); padding: 0.6rem; border-radius: 10px; display: flex; }
+        /* --- Sidebar Navigation --- */
+        .sidebar { width: 280px; background: var(--brand-dark); color: white; display: flex; flex-direction: column; padding: 2rem 1.5rem; justify-content: space-between; }
+        .brand { font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 10px; margin-bottom: 3rem; color: white; }
+        .brand i { color: var(--brand-secondary); }
+        .nav-menu { display: flex; flex-direction: column; gap: 0.5rem; }
+        .nav-item { padding: 1rem 1.2rem; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; color: #94A3B8; transition: all 0.3s ease; }
+        .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: var(--brand-primary); color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); }
+        .sidebar-footer { display: flex; flex-direction: column; gap: 10px; }
+        .btn-side { width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+        .btn-side:hover { background: rgba(255,255,255,0.2); }
+        .btn-danger { color: #FCA5A5; border-color: rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.1); color: #FECACA; }
 
-        /* Grid Info */
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; background: #F8FAFC; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border); }
-        .info-item { display: flex; flex-direction: column; gap: 0.3rem; }
-        .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; }
-        .info-value { font-size: 1.05rem; font-weight: 600; color: #1E293B; }
+        /* --- Main Content Area --- */
+        .main-content { flex: 1; padding: 2.5rem 3rem; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .page-title { font-size: 2rem; font-weight: 700; color: var(--text-main); }
+        .page-subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* --- Sections (Wizard Pages) --- */
+        .wizard-step { display: none; animation: fadeIn 0.4s ease forwards; }
+        .wizard-step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Cards & UI Elements --- */
+        .card { background: var(--bg-surface); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .card-header { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .card-header i { color: var(--brand-primary); }
 
         /* Upload Zones */
-        .upload-zone { border: 2px dashed #CBD5E1; padding: 3rem 2rem; text-align: center; border-radius: var(--radius-md); background: #F8FAFC; cursor: pointer; position: relative; transition: all 0.3s; }
-        .upload-zone:hover { border-color: var(--primary); background: #EEF2FF; }
-        .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-        .upload-icon { color: var(--primary); margin-bottom: 1rem; opacity: 0.8; transition: transform 0.3s; }
-        .upload-zone:hover .upload-icon { transform: scale(1.1); opacity: 1; }
+        .upload-zone { border: 2px dashed #CBD5E1; border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center; cursor: pointer; background: #F8FAFC; transition: 0.3s; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        .upload-zone:hover { border-color: var(--brand-primary); background: #EEF2FF; }
+        .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .upload-zone i { font-size: 3rem; color: var(--brand-primary); margin-bottom: 1rem; }
+        .upload-zone h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
 
-        .json-upload-zone { border: 2px dashed var(--primary); background: #EEF2FF; padding: 5rem 2rem; }
-        
+        /* Tender Info Grid */
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+        .info-item { background: var(--bg-body); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--border-color); }
+        .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; }
+        .info-value { font-size: 1rem; font-weight: 600; color: var(--text-main); }
+
         /* File List */
-        .file-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-        .file-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .file-detail { display: flex; flex-direction: column; overflow: hidden; width: 85%; }
-        .file-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #334155; }
-        .file-meta { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
-        .badge-duplicate { background: var(--danger-bg); color: var(--danger-text); padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-top: 0.4rem; display: inline-block; width: max-content; }
-        
+        .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .file-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 10px; }
+        .file-info { display: flex; flex-direction: column; overflow: hidden; width: 85%; }
+        .file-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;}
+        .btn-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 1.1rem; padding: 5px;}
+        .btn-icon:hover { color: var(--danger); }
+        .badge-dup { background: #FEE2E2; color: #B91C1C; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; width: max-content; margin-top: 5px; }
+
         /* Table */
-        .table-wrapper { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #F8FAFC; padding: 1.25rem 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; border-bottom: 2px solid var(--border); }
-        td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--neutral-bg); font-size: 0.95rem; vertical-align: middle; font-weight: 500;}
+        .table-container { overflow-x: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+        table { width: 100%; border-collapse: collapse; text-align: left; background: var(--bg-surface); }
+        th { background: #F8FAFC; padding: 1rem; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); border-bottom: 2px solid var(--border-color); }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; vertical-align: middle; font-weight: 500;}
         tr:last-child td { border-bottom: none; }
+        
+        select, input[type="date"], input[type="text"] { width: 100%; padding: 0.6rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 0.9rem; outline: none; transition: 0.2s; }
+        select:focus, input[type="date"]:focus, input[type="text"]:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 
-        /* Form Inputs */
-        select, input[type="date"], input[type="text"] { width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.95rem; font-weight: 500; font-family: inherit; transition: 0.2s; outline: none; background: #F8FAFC; color: var(--text-main); }
-        select:focus, input[type="date"]:focus, input[type="text"]:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
-        
-        /* Badges */
-        .badge { padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0.02em; }
-        .b-missing, .b-expired { background: var(--danger-bg); color: var(--danger-text); }
-        .b-expiryNeeded { background: var(--warning-bg); color: var(--warning-text); }
-        .b-ok { background: var(--success-bg); color: var(--success-text); }
-        .b-optional { background: var(--neutral-bg); color: var(--neutral-text); }
+        /* Status Badges */
+        .badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;}
+        .b-missing, .b-expired { background: var(--danger); color: white; }
+        .b-expiryNeeded { background: var(--warning); color: white; }
+        .b-ok { background: var(--success); color: white; }
+        .b-optional { background: var(--text-muted); color: white; }
 
-        /* Advanced Widgets (Bonus) */
-        .bonus-card { background: #F8FAFC; border: 2px dashed #C7D2FE; }
-        .bonus-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-        .bonus-box { padding: 1.5rem; background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .bonus-box h4 { margin-bottom: 1.25rem; color: var(--text-main); font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;}
-        .btn-bonus { width: 100%; padding: 0.75rem; margin-bottom: 0.75rem; background: var(--surface); border: 2px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; color: var(--text-muted);}
-        .btn-bonus:hover { border-color: var(--primary); color: var(--primary); background: #EEF2FF; }
-        .btn-ai-glow { background: linear-gradient(135deg, #10B981, #059669); border: none; color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
-        .btn-ai-glow:hover { background: linear-gradient(135deg, #059669, #047857); color: white; transform: translateY(-1px); }
+        /* Tools Grid (Bonus) */
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .tool-box { border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-md); background: #F8FAFC; }
+        .tool-box h4 { margin-bottom: 1rem; color: var(--brand-dark); display: flex; align-items: center; gap: 8px; font-size: 1rem; }
+        .btn-action { width: 100%; padding: 0.8rem; background: white; border: 1px solid var(--border-color); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 0.5rem; color: var(--text-main); font-size: 0.9rem;}
+        .btn-action:hover { border-color: var(--brand-primary); color: var(--brand-primary); box-shadow: var(--shadow-sm); }
+        .btn-ai { background: linear-gradient(135deg, #8B5CF6, #6366F1); color: white; border: none; }
+        .btn-ai:hover { background: linear-gradient(135deg, #7C3AED, #4F46E5); color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
 
-        /* Glassmorphism Action Area */
-        .action-area { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1000px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 1.25rem 2rem; border-radius: 100px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
-        .action-content { display: flex; align-items: center; gap: 1.5rem; width: 100%; }
-        .error-box { background: var(--danger-bg); color: var(--danger-text); padding: 0.75rem 1.5rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600; flex: 1; display: flex; align-items: center; border: 1px solid #FECACA; }
-        
-        .btn-generate { padding: 1rem 2.5rem; background: var(--primary-gradient); color: white; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); white-space: nowrap; margin-left: auto; }
-        .btn-generate:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.5); }
-        .btn-generate:disabled { background: #94A3B8; cursor: not-allowed; box-shadow: none; transform: none; }
-        
-        .icon-btn { background: #F1F5F9; border: none; color: var(--text-muted); cursor: pointer; padding: 0.6rem; border-radius: 8px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
-        .icon-btn:hover { background: var(--danger-bg); color: var(--danger-text); }
-        
-        #workspace-area { display: none; }
-        #json-upload-area { display: block; }
+        /* Floating Action Bar */
+        .fab-container { position: fixed; bottom: 2rem; right: 3rem; display: flex; align-items: center; gap: 1rem; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 1rem; border-radius: 50px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); z-index: 100;}
+        .error-text { color: var(--danger); font-weight: 700; font-size: 0.9rem; margin-right: 10px; display: none; align-items: center; gap: 5px;}
+        .btn-generate { padding: 1rem 2rem; background: var(--brand-primary); color: white; border: none; border-radius: 40px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .btn-generate:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
+        .btn-generate:disabled { background: #94A3B8; cursor: not-allowed; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header class="app-header">
-        <div>
-            <h1 class="app-title" id="app-title">Tender Package Builder</h1>
-            <p class="app-subtitle">Developer: Mahmud Al-Hadi (251-35-505) | Enterprise Vibe</p>
-        </div>
-        <div class="btn-group">
-            <button class="btn-outline btn-reset" onclick="hardReset()" id="btn-reset">Reset Workspace</button>
-            <button class="btn-outline" onclick="toggleLanguage()" id="btn-lang">বাংলায় দেখুন</button>
-        </div>
-    </header>
+<!-- Toast Notification Container -->
+<div id="toast-container"></div>
 
-    <!-- STEP 1: JSON Upload -->
-    <div class="card" id="json-upload-area">
-        <div class="card-header">
-            <div class="icon-wrapper">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-            </div>
-            <span id="title-load-json">Step 1: Database Initialization</span>
+<!-- Sidebar Layout -->
+<aside class="sidebar">
+    <div>
+        <div class="brand">
+            <i class="fa-solid fa-layer-group"></i> TenderX
         </div>
-        <div class="upload-zone json-upload-zone">
-            <input type="file" accept="application/json" onchange="handleJsonUpload(event)">
-            <svg class="upload-icon" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            <h3 id="json-hint" style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 800; color: #1E293B;">Upload requirements.json</h3>
-            <p id="json-subhint" style="color: var(--text-muted); font-weight: 500;">Provide the tender JSON data schema to configure the workspace.</p>
+        <div class="nav-menu">
+            <div class="nav-item active" id="nav-1" onclick="switchTab(1)">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span id="t-nav-1">1. Initialize</span>
+            </div>
+            <div class="nav-item" id="nav-2" onclick="switchTab(2)">
+                <i class="fa-solid fa-file-pdf"></i> <span id="t-nav-2">2. Repository</span>
+            </div>
+            <div class="nav-item" id="nav-3" onclick="switchTab(3)">
+                <i class="fa-solid fa-network-wired"></i> <span id="t-nav-3">3. Mapping</span>
+            </div>
+            <div class="nav-item" id="nav-4" onclick="switchTab(4)">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> <span id="t-nav-4">4. Tools & Compile</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="sidebar-footer">
+        <button class="btn-side" onclick="toggleLanguage()"><i class="fa-solid fa-language"></i> <span id="btn-lang-text">বাংলায় দেখুন</span></button>
+        <button class="btn-side btn-danger" onclick="hardReset()"><i class="fa-solid fa-trash-can"></i> <span id="btn-reset-text">Reset Project</span></button>
+    </div>
+</aside>
+
+<!-- Main Content Area -->
+<main class="main-content">
+    
+    <div class="top-bar">
+        <div>
+            <h1 class="page-title" id="page-title">Initialize Project</h1>
+            <p class="page-subtitle" id="page-subtitle">Start by loading your JSON requirements schema.</p>
         </div>
     </div>
 
-    <!-- WORKSPACE (Step 2 onwards) -->
-    <div id="workspace-area">
-        
-        <!-- Tender Details -->
+    <!-- STEP 1: INITIALIZE (JSON) -->
+    <div class="wizard-step active" id="step-1">
         <div class="card">
-            <div class="card-header">
-                <div class="icon-wrapper">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <span id="title-tender">Tender Specification</span>
+            <div class="card-header"><i class="fa-solid fa-database"></i> <span id="t-s1-h1">Requirements Schema</span></div>
+            <div class="upload-zone" id="zone-json">
+                <input type="file" accept="application/json" onchange="handleJsonUpload(event)">
+                <i class="fa-solid fa-file-code"></i>
+                <h3 id="t-s1-h2">Upload requirements.json</h3>
+                <p id="t-s1-p">Drag and drop or click to browse. Contains tender & document definitions.</p>
             </div>
-            <div class="info-grid" id="tender-details"></div>
+            
+            <div id="tender-info-box" class="hidden" style="margin-top: 2rem;">
+                <div class="card-header"><i class="fa-solid fa-circle-info"></i> <span id="t-s1-h3">Loaded Tender Details</span></div>
+                <div class="info-grid" id="tender-details"></div>
+                <button class="btn-action" style="margin-top: 1.5rem; max-width: 250px; background: var(--brand-primary); color: white;" onclick="switchTab(2)"><i class="fa-solid fa-arrow-right"></i> Next: Upload PDFs</button>
+            </div>
         </div>
+    </div>
 
-        <!-- Task 4.2: Upload PDFs -->
+    <!-- STEP 2: REPOSITORY (PDFs) -->
+    <div class="wizard-step" id="step-2">
         <div class="card">
-            <div class="card-header">
-                <div class="icon-wrapper">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                </div>
-                <span id="title-upload">Document Repository (PDF Only)</span>
-            </div>
-            <div class="upload-zone">
+            <div class="card-header"><i class="fa-solid fa-folder-open"></i> <span id="t-s2-h1">Document Repository</span></div>
+            <div class="upload-zone" style="padding: 2.5rem 2rem;">
                 <input type="file" accept="application/pdf" multiple onchange="handlePdfUpload(event)">
-                <svg class="upload-icon" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
-                <h3 id="upload-hint" style="margin-bottom: 0.5rem; font-weight: 700;">Drop PDF files here or click to browse</h3>
-                <p id="upload-subhint" style="color: var(--text-muted); font-size: 0.9rem;">Encrypted or corrupted files will be automatically filtered safely.</p>
+                <i class="fa-regular fa-file-pdf"></i>
+                <h3 id="t-s2-h2">Add PDF Documents</h3>
+                <p id="t-s2-p">Safe upload enabled. Encrypted or corrupted files are filtered.</p>
             </div>
-            <div class="file-list" id="uploaded-files-list"></div>
+            <div class="file-grid" id="uploaded-files-list"></div>
         </div>
+    </div>
 
-        <!-- Task 4.3 & 4.4: Match & Expiry -->
+    <!-- STEP 3: MAPPING (Match & Expiry) -->
+    <div class="wizard-step" id="step-3">
         <div class="card">
-            <div class="card-header">
-                <div class="icon-wrapper">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                </div>
-                <span id="title-match">Requirement Mapping</span>
-            </div>
-            <div class="table-wrapper">
+            <div class="card-header"><i class="fa-solid fa-link"></i> <span id="t-s3-h1">Requirement Mapping</span></div>
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
                             <th id="th-req" style="width: 35%">Requirement</th>
                             <th id="th-file" style="width: 30%">Matched File</th>
-                            <th id="th-expiry" style="width: 20%">Expiry Date</th>
-                            <th id="th-status" style="width: 15%">Validation</th>
+                            <th id="th-expiry" style="width: 15%">Expiry Date</th>
+                            <th id="th-status" style="width: 20%">Status</th>
                         </tr>
                     </thead>
                     <tbody id="requirements-body"></tbody>
                 </table>
             </div>
         </div>
+    </div>
 
-        <!-- BONUS TASKS SECTION (Section 7) -->
-        <div class="card bonus-card">
-            <div class="card-header" style="border-bottom-color: #C7D2FE;">
-                <div class="icon-wrapper" style="background: var(--primary); color: white;">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                <span>Advanced Tools & AI Features</span>
-            </div>
-            
-            <div class="bonus-grid">
-                <!-- Data & Project -->
-                <div class="bonus-box">
-                    <h4><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Data Operations</h4>
-                    <button class="btn-bonus" onclick="exportCSV()">Download Meta-Checklist (CSV)</button>
-                    <button class="btn-bonus" onclick="exportProject()">Export Workspace Backup (.json)</button>
-                    <label class="btn-bonus" style="text-align: center; cursor: pointer; display:block;">
-                        Import Workspace <input type="file" style="display:none" accept=".json" onchange="importProject(event)">
-                    </label>
-                </div>
+    <!-- STEP 4: TOOLS & COMPILE (Bonus Features) -->
+    <div class="wizard-step" id="step-4">
+        <div class="card">
+            <div class="card-header"><i class="fa-solid fa-toolbox"></i> <span id="t-s4-h1">Advanced Tools & Compilation</span></div>
+            <div class="tools-grid">
                 
-                <!-- Matching -->
-                <div class="bonus-box">
-                    <h4><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Smart Allocation</h4>
-                    <button class="btn-bonus" onclick="autoMatch()">Basic Heuristic Match</button>
-                    <div style="margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 10px;">
-                        <input type="text" id="ai-api-key" placeholder="Enter Gemini API Key..." style="margin-bottom: 8px; padding:0.6rem; font-size:0.85rem;">
-                        <button class="btn-bonus btn-ai-glow" onclick="aiAutoMatch()" id="btn-ai">✨ AI Deep Match</button>
+                <!-- Match Tools -->
+                <div class="tool-box">
+                    <h4><i class="fa-solid fa-brain"></i> <span id="t-b-m1">Smart Matching</span></h4>
+                    <button class="btn-action" onclick="autoMatch()"><i class="fa-solid fa-bolt"></i> Basic Heuristic Match</button>
+                    <div style="margin-top: 1rem;">
+                        <input type="password" id="ai-api-key" placeholder="Enter Gemini API Key..." style="margin-bottom: 0.5rem;">
+                        <button class="btn-action btn-ai" onclick="aiAutoMatch()" id="btn-ai"><i class="fa-solid fa-sparkles"></i> AI Deep Match</button>
                     </div>
                 </div>
 
-                <!-- Document Stamp -->
-                <div class="bonus-box">
-                    <h4><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg> Seal Integration</h4>
-                    <label class="btn-bonus" style="text-align: center; cursor: pointer; display:block;">
-                        Upload PNG Signature <input type="file" style="display:none" accept="image/png" id="seal-upload" onchange="handleSealUpload(event)">
+                <!-- Seal/Signature -->
+                <div class="tool-box">
+                    <h4><i class="fa-solid fa-stamp"></i> <span id="t-b-s1">Seal & Signature</span></h4>
+                    <label class="btn-action" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fa-solid fa-upload"></i> Upload PNG Seal
+                        <input type="file" style="display:none" accept="image/png" id="seal-upload" onchange="handleSealUpload(event)">
                     </label>
-                    <div id="seal-status" style="font-size: 0.8rem; color: var(--success-text); margin-top: 5px; font-weight: 600;"></div>
-                    <select id="seal-placement" style="margin-top: 10px; font-size: 0.85rem; padding: 0.6rem;">
+                    <div id="seal-status" style="font-size: 0.85rem; color: var(--success); font-weight: 600; text-align: center; margin: 5px 0;">No Seal Uploaded</div>
+                    <select id="seal-placement">
                         <option value="none">Disable Seal Rendering</option>
                         <option value="cover">Render on Cover & Index</option>
                         <option value="all" selected>Render Across All Pages</option>
                     </select>
                 </div>
+
+                <!-- Export/Import -->
+                <div class="tool-box">
+                    <h4><i class="fa-solid fa-download"></i> <span id="t-b-e1">Data Operations</span></h4>
+                    <button class="btn-action" onclick="exportCSV()"><i class="fa-solid fa-file-csv"></i> Download Audit (CSV)</button>
+                    <button class="btn-action" onclick="exportProject()"><i class="fa-solid fa-file-export"></i> Backup Workspace (.json)</button>
+                    <label class="btn-action" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fa-solid fa-file-import"></i> Restore Workspace
+                        <input type="file" style="display:none" accept=".json" onchange="importProject(event)">
+                    </label>
+                </div>
+
             </div>
         </div>
-
     </div>
 
-    <!-- Floating Action Dock -->
-    <div class="action-area">
-        <div class="action-content">
-            <div class="error-box" id="blocking-errors" style="display: none;"></div>
-            <button class="btn-generate" id="btn-generate" onclick="generatePackage()" disabled>
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span id="btn-gen-text">Compile Final Package</span>
-            </button>
+    <!-- Floating Action Bar for Generating PDF -->
+    <div class="fab-container">
+        <div class="error-text" id="blocking-errors">
+            <i class="fa-solid fa-circle-exclamation"></i> <span id="fab-error-msg">Resolve Conflicts</span>
         </div>
+        <button class="btn-generate" id="btn-generate" onclick="generatePackage()" disabled>
+            <i class="fa-solid fa-file-pdf"></i> <span id="btn-gen-text">Compile Final Package</span>
+        </button>
     </div>
-</div>
 
+</main>
+
+<!-- JAVASCRIPT LOGIC -->
 <script>
+    // --- Global State ---
     let currentLang = 'en'; 
     let tenderData = null; 
     let requirements = []; 
@@ -277,13 +299,54 @@
     let expiries = {}; 
     let customSealBase64 = null; 
 
-    // --- Base64 Converters for Safe Storage ---
+    // --- Toast Notification System ---
+    function showToast(message, type = "success") {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icon = type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-exclamation"></i>';
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    }
+
+    // --- Tab Navigation Logic ---
+    const pageTitles = {
+        en: ["Initialize Project", "Document Repository", "Requirement Mapping", "Advanced Tools & Compilation"],
+        bn: ["প্রজেক্ট শুরু করুন", "ডকুমেন্ট ভল্ট", "প্রয়োজনীয়তা ম্যাপিং", "অ্যাডভান্সড টুলস এবং কম্পাইল"]
+    };
+    const pageSubs = {
+        en: ["Start by loading your JSON schema.", "Upload and manage your PDF files safely.", "Map your files to the official tender requirements.", "Use AI, Stamps, and export your final package."],
+        bn: ["JSON স্কিমা লোড করে শুরু করুন।", "নিরাপদে আপনার PDF ফাইলগুলো আপলোড করুন।", "অফিসিয়াল দরপত্রের প্রয়োজনীয়তার সাথে আপনার ফাইলগুলো মেলান।", "AI, স্ট্যাম্প ব্যবহার করুন এবং প্যাকেজ তৈরি করুন।"]
+    };
+
+    function switchTab(stepNum) {
+        if(stepNum > 1 && !tenderData) {
+            showToast(currentLang === 'en' ? "Please upload requirements.json first!" : "প্রথমে requirements.json আপলোড করুন!", "error");
+            return;
+        }
+
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(`nav-${stepNum}`).classList.add('active');
+        document.getElementById(`step-${stepNum}`).classList.add('active');
+        
+        document.getElementById('page-title').innerText = pageTitles[currentLang][stepNum-1];
+        document.getElementById('page-subtitle').innerText = pageSubs[currentLang][stepNum-1];
+    }
+
+    // --- Storage Handling (localStorage + Base64) ---
     function abToBase64(buffer) {
         let binary = ''; const bytes = new Uint8Array(buffer);
         for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
         return window.btoa(binary);
     }
-
     function base64ToAb(base64) {
         const binStr = window.atob(base64); const len = binStr.length;
         const bytes = new Uint8Array(len);
@@ -291,85 +354,106 @@
         return bytes.buffer;
     }
 
-    // --- Core Memory Persistence ---
     function saveState() {
         try {
-            if(tenderData) localStorage.setItem('v_data', JSON.stringify(tenderData));
-            if(requirements.length) localStorage.setItem('v_reqs', JSON.stringify(requirements));
-            localStorage.setItem('v_match', JSON.stringify(matches));
-            localStorage.setItem('v_exp', JSON.stringify(expiries));
-            if(customSealBase64) localStorage.setItem('v_seal', customSealBase64);
+            if(tenderData) localStorage.setItem('tx_data', JSON.stringify(tenderData));
+            if(requirements.length) localStorage.setItem('tx_reqs', JSON.stringify(requirements));
+            localStorage.setItem('tx_match', JSON.stringify(matches));
+            localStorage.setItem('tx_exp', JSON.stringify(expiries));
+            if(customSealBase64) localStorage.setItem('tx_seal', customSealBase64);
             
-            const filesData = uploadedFiles.map(f => ({
-                id: f.id, name: f.name, pages: f.pages, isDuplicate: f.isDuplicate, base64: abToBase64(f.buffer)
-            }));
-            localStorage.setItem('v_files', JSON.stringify(filesData));
-        } catch(e) { console.warn("Storage limits exceeded. Working purely in RAM."); }
+            const filesData = uploadedFiles.map(f => ({ id: f.id, name: f.name, pages: f.pages, isDuplicate: f.isDuplicate, base64: abToBase64(f.buffer) }));
+            localStorage.setItem('tx_files', JSON.stringify(filesData));
+        } catch(e) {
+            console.warn("Storage limits exceeded. Working in RAM mode.");
+        }
     }
 
     function loadState() {
         try {
-            const td = localStorage.getItem('v_data'); if(td) tenderData = JSON.parse(td);
-            const rq = localStorage.getItem('v_reqs'); if(rq) requirements = JSON.parse(rq);
-            const mt = localStorage.getItem('v_match'); if(mt) matches = JSON.parse(mt);
-            const ex = localStorage.getItem('v_exp'); if(ex) expiries = JSON.parse(ex);
-            const seal = localStorage.getItem('v_seal'); if(seal) { customSealBase64 = seal; document.getElementById('seal-status').innerText = "Active ✓"; }
+            const td = localStorage.getItem('tx_data'); if(td) tenderData = JSON.parse(td);
+            const rq = localStorage.getItem('tx_reqs'); if(rq) requirements = JSON.parse(rq);
+            const mt = localStorage.getItem('tx_match'); if(mt) matches = JSON.parse(mt);
+            const ex = localStorage.getItem('tx_exp'); if(ex) expiries = JSON.parse(ex);
+            const seal = localStorage.getItem('tx_seal'); if(seal) { customSealBase64 = seal; document.getElementById('seal-status').innerText = "Active ✓"; }
             
-            const fl = localStorage.getItem('v_files');
+            const fl = localStorage.getItem('tx_files');
             if(fl) {
-                uploadedFiles = JSON.parse(fl).map(f => ({
-                    id: f.id, name: f.name, pages: f.pages, isDuplicate: f.isDuplicate, buffer: base64ToAb(f.base64)
-                }));
+                uploadedFiles = JSON.parse(fl).map(f => ({ id: f.id, name: f.name, pages: f.pages, isDuplicate: f.isDuplicate, buffer: base64ToAb(f.base64) }));
             }
         } catch(e) {}
+        
+        if(tenderData) {
+            document.getElementById('zone-json').classList.add('hidden');
+            document.getElementById('tender-info-box').classList.remove('hidden');
+            switchTab(2); // Auto jump to step 2 if data exists
+        }
         checkDuplicates(); renderApp();
     }
 
     window.onload = () => loadState();
 
     function hardReset() {
-        if(confirm("Factory reset? All local configurations and files will be permanently erased.")) {
+        if(confirm(currentLang === 'en' ? "Factory reset? All local configurations and files will be permanently erased." : "সব ডেটা মুছে ফেলতে চান?")) {
             tenderData = null; requirements = []; matches = {}; expiries = {}; uploadedFiles = []; customSealBase64 = null;
-            localStorage.clear(); renderApp();
+            localStorage.clear();
+            document.getElementById('zone-json').classList.remove('hidden');
+            document.getElementById('tender-info-box').classList.add('hidden');
+            document.getElementById('seal-status').innerText = "No Seal Uploaded";
+            showToast("System Reset Successful");
+            switchTab(1);
+            renderApp();
         }
     }
 
-    // --- Core Handlers ---
+    // --- Task 4.1: Handle JSON ---
     async function handleJsonUpload(event) {
         const file = event.target.files[0]; if (!file) return;
         try {
             const text = await file.text(); const data = JSON.parse(text);
-            if(!data.tender || !data.requirements) { alert("Invalid schema. Expected 'tender' and 'requirements' entities."); return; }
+            if(!data.tender || !data.requirements) { 
+                showToast("Invalid schema. Expected 'tender' and 'requirements'.", "error"); return; 
+            }
             tenderData = data.tender; requirements = data.requirements;
-            saveState(); renderApp();
-        } catch (error) { alert("Failed parsing JSON schema."); }
+            saveState(); 
+            document.getElementById('zone-json').classList.add('hidden');
+            document.getElementById('tender-info-box').classList.remove('hidden');
+            showToast("Project Initialized Successfully!");
+            renderApp();
+        } catch (error) { showToast("Failed parsing JSON schema.", "error"); }
     }
 
+    // --- Task 4.2: Handle PDFs ---
     async function handlePdfUpload(event) {
+        let added = 0; let skipped = 0;
         for (let file of event.target.files) {
-            if (file.type !== "application/pdf") continue;
+            if (file.type !== "application/pdf") { skipped++; continue; }
             const buffer = await file.arrayBuffer(); let pages = 0;
             
             try { 
                 const pdf = await PDFLib.PDFDocument.load(buffer, { ignoreEncryption: true }); 
                 if(pdf.isEncrypted) throw new Error("Encrypted");
                 pages = pdf.getPageCount(); 
-            } catch(e) { 
-                alert(`Security Filter Triggered: [${file.name}] is damaged or encrypted.`); 
-                continue; 
-            }
+            } catch(e) { skipped++; continue; }
             
             uploadedFiles.push({ id: 'f_' + Date.now() + Math.random(), name: file.name, buffer: buffer, pages: pages, isDuplicate: false });
+            added++;
         }
-        event.target.value = ''; checkDuplicates(); saveState(); renderApp();
+        event.target.value = ''; 
+        if(added > 0) showToast(`${added} PDF(s) added successfully.`);
+        if(skipped > 0) showToast(`${skipped} file(s) skipped (Invalid or Encrypted).`, "warning");
+        
+        checkDuplicates(); saveState(); renderApp();
     }
 
     function removeFile(fileId) {
         uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
         for (let reqId in matches) if (matches[reqId] === fileId) { delete matches[reqId]; delete expiries[reqId]; }
         checkDuplicates(); saveState(); renderApp();
+        showToast("File removed.");
     }
 
+    // --- Task 4.6: Strict Exact Duplicate Check ---
     function checkDuplicates() {
         uploadedFiles.forEach(f => f.isDuplicate = false);
         for (let i = 0; i < uploadedFiles.length; i++) {
@@ -384,24 +468,33 @@
         }
     }
 
+    // --- Task 4.5: Status Logic ---
     function getStatus(req) {
-        if(!tenderData) return { code: 'missing', block: true, css: 'b-missing' };
+        if(!tenderData) return { code: 'missing', block: true, css: 'b-missing', icon: 'fa-xmark' };
         const fileId = matches[req.id];
-        if (req.mandatory && !fileId) return { code: 'missing', block: true, css: 'b-missing' };
-        if (!req.mandatory && !fileId) return { code: 'notProvided', block: false, css: 'b-optional' };
+        if (req.mandatory && !fileId) return { code: 'missing', block: true, css: 'b-missing', icon: 'fa-xmark' };
+        if (!req.mandatory && !fileId) return { code: 'notProvided', block: false, css: 'b-optional', icon: 'fa-minus' };
         if (req.has_expiry && fileId) {
-            if (!expiries[req.id]) return { code: 'expiryNeeded', block: true, css: 'b-expiryNeeded' };
-            if (new Date(expiries[req.id]) < new Date(tenderData.submission_deadline)) return { code: 'expired', block: true, css: 'b-expired' };
+            if (!expiries[req.id]) return { code: 'expiryNeeded', block: true, css: 'b-expiryNeeded', icon: 'fa-calendar-exclamation' };
+            if (new Date(expiries[req.id]) < new Date(tenderData.submission_deadline)) return { code: 'expired', block: true, css: 'b-expired', icon: 'fa-calendar-xmark' };
         }
-        return { code: 'ok', block: false, css: 'b-ok' };
+        return { code: 'ok', block: false, css: 'b-ok', icon: 'fa-check' };
     }
 
-    function updateMatch(reqId, val) { if(!val){ delete matches[reqId]; delete expiries[reqId]; } else matches[reqId] = val; saveState(); renderApp(); }
-    function updateExpiry(reqId, val) { expiries[reqId] = val; saveState(); renderApp(); }
+    function updateMatch(reqId, val) { 
+        if(!val){ delete matches[reqId]; delete expiries[reqId]; } 
+        else matches[reqId] = val; 
+        saveState(); renderApp(); 
+    }
+    
+    function updateExpiry(reqId, val) { 
+        expiries[reqId] = val; 
+        saveState(); renderApp(); 
+    }
 
-    // --- Bonus Features ---
+    // --- BONUS TASKS ---
     function exportCSV() {
-        if(!requirements.length) return;
+        if(!requirements.length) return showToast("No requirements loaded.", "error");
         let csvContent = "data:text/csv;charset=utf-8,Requirement,Matched File Name,Pages,Expiry Date,Status\n";
         requirements.sort((a,b) => a.order - b.order).forEach(req => {
             const file = uploadedFiles.find(f => f.id === matches[req.id]);
@@ -409,14 +502,16 @@
         });
         const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent));
         link.setAttribute("download", `${tenderData ? tenderData.tender_id : 'Tender'}_Audit.csv`); link.click();
+        showToast("CSV Downloaded.");
     }
 
     function exportProject() {
-        if(!tenderData) return;
+        if(!tenderData) return showToast("Nothing to export.", "error");
         saveState(); 
-        const blob = new Blob([JSON.stringify({ v_data: localStorage.getItem('v_data'), v_reqs: localStorage.getItem('v_reqs'), v_match: localStorage.getItem('v_match'), v_exp: localStorage.getItem('v_exp'), v_files: localStorage.getItem('v_files'), v_seal: localStorage.getItem('v_seal') })], {type: "application/json"});
+        const blob = new Blob([JSON.stringify({ v_data: localStorage.getItem('tx_data'), v_reqs: localStorage.getItem('tx_reqs'), v_match: localStorage.getItem('tx_match'), v_exp: localStorage.getItem('tx_exp'), v_files: localStorage.getItem('tx_files'), v_seal: localStorage.getItem('tx_seal') })], {type: "application/json"});
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
         link.download = `${tenderData.tender_id}_Workspace.json`; link.click();
+        showToast("Project Backup Exported.");
     }
 
     function importProject(event) {
@@ -426,8 +521,10 @@
             try {
                 const data = JSON.parse(e.target.result);
                 Object.keys(data).forEach(k => { if(data[k]) localStorage.setItem(k, data[k]); });
-                loadState(); alert("Workspace synced successfully.");
-            } catch(err) { alert("Corrupted workspace file."); }
+                loadState(); showToast("Workspace synced successfully.");
+                document.getElementById('zone-json').classList.add('hidden');
+                document.getElementById('tender-info-box').classList.remove('hidden');
+            } catch(err) { showToast("Corrupted workspace file.", "error"); }
         };
         reader.readAsText(file);
     }
@@ -442,17 +539,21 @@
             }
         });
         saveState(); renderApp();
+        showToast(`Auto-matched ${matchedCount} documents!`);
     }
 
     async function aiAutoMatch() {
         const apiKey = document.getElementById('ai-api-key').value;
-        if(!apiKey) return alert("Gemini API Key Required.");
-        const btn = document.getElementById('btn-ai'); btn.innerText = "Analyzing Context..."; btn.disabled = true;
+        if(!apiKey) return showToast("Gemini API Key Required.", "error");
+        const btn = document.getElementById('btn-ai'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking...'; btn.disabled = true;
         
         const unmatchedReqs = requirements.filter(r => !matches[r.id]).map(r => ({id: r.id, name: r.title_en}));
         const availableFiles = uploadedFiles.filter(f => !f.isDuplicate && !Object.values(matches).includes(f.id)).map(f => ({id: f.id, name: f.name}));
         
-        if(!unmatchedReqs.length || !availableFiles.length) { btn.innerText = "✨ AI Deep Match"; btn.disabled = false; return; }
+        if(!unmatchedReqs.length || !availableFiles.length) { 
+            btn.innerHTML = '<i class="fa-solid fa-sparkles"></i> AI Deep Match'; btn.disabled = false; 
+            return showToast("Nothing to match.", "warning"); 
+        }
 
         const prompt = `Match these files to requirements based on names. Requirements: ${JSON.stringify(unmatchedReqs)}. Files: ${JSON.stringify(availableFiles)}. Return strictly valid JSON array of objects with 'reqId' and 'fileId'. No markdown.`;
 
@@ -463,10 +564,12 @@
             });
             const data = await response.json();
             const aiMatches = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim());
-            aiMatches.forEach(m => { if(m.reqId && m.fileId) { matches[m.reqId] = m.fileId; } });
+            let count = 0;
+            aiMatches.forEach(m => { if(m.reqId && m.fileId) { matches[m.reqId] = m.fileId; count++; } });
             saveState(); renderApp();
-        } catch(e) { alert("AI Service Unreachable."); }
-        btn.innerText = "✨ AI Deep Match"; btn.disabled = false;
+            showToast(`AI successfully matched ${count} documents.`);
+        } catch(e) { showToast("AI Service Failed. Check API Key.", "error"); }
+        btn.innerHTML = '<i class="fa-solid fa-sparkles"></i> AI Deep Match'; btn.disabled = false;
     }
 
     function handleSealUpload(event) {
@@ -476,59 +579,68 @@
             customSealBase64 = e.target.result;
             document.getElementById('seal-status').innerText = "Active ✓";
             saveState();
+            showToast("Seal Uploaded Successfully.");
         };
         reader.readAsDataURL(file);
     }
 
-    // --- UI Render ---
+    // --- UI RENDER & LOCALIZATION ---
+    const tDict = {
+        en: { langBtn: "বাংলায় দেখুন", resetBtn: "Reset Workspace", nav1: "1. Initialize", nav2: "2. Repository", nav3: "3. Mapping", nav4: "4. Tools & Compile", s1h1: "Requirements Schema", s1h2: "Upload requirements.json", s1p: "Drag and drop or click to browse. Contains tender & document definitions.", s1h3: "Loaded Tender Details", s2h1: "Document Repository", s2h2: "Add PDF Documents", s2p: "Safe upload enabled. Encrypted or corrupted files are filtered.", s3h1: "Requirement Mapping", thReq: "Requirement", thFile: "Matched File", thExp: "Expiry Date", thStat: "Validation", s4h1: "Advanced Tools & Compilation", t1: "Smart Matching", t2: "Seal & Signature", t3: "Data Operations", btnGen: "Compile Final Package", missing: "Missing", expiryNeeded: "Expiry Needed", expired: "Expired", notProvided: "Not provided", ok: "Validated", opt: "Optional" },
+        bn: { langBtn: "View in English", resetBtn: "সব ডেটা মুছুন", nav1: "১. শুরু করুন", nav2: "২. ডকুমেন্ট ভল্ট", nav3: "৩. ম্যাপিং", nav4: "৪. টুলস ও প্যাকেজ", s1h1: "প্রয়োজনীয়তার স্কিমা", s1h2: "requirements.json আপলোড করুন", s1p: "ফাইলটি এখানে দিন। এতে দরপত্রের নিয়ম লেখা আছে।", s1h3: "দরপত্রের বিস্তারিত", s2h1: "ডকুমেন্ট ভল্ট", s2h2: "PDF আপলোড করুন", s2p: "নিরাপদ আপলোড। নষ্ট বা পাসওয়ার্ড দেয়া ফাইল বাতিল হবে।", s3h1: "ফাইল মেলান", thReq: "প্রয়োজনীয়তা", thFile: "ফাইল", thExp: "মেয়াদ", thStat: "অবস্থা", s4h1: "অ্যাডভান্সড টুলস", t1: "স্মার্ট ম্যাপিং", t2: "সিল ও স্বাক্ষর", t3: "ডেটা এক্সপোর্ট", btnGen: "প্যাকেজ তৈরি করুন", missing: "অনুপস্থিত", expiryNeeded: "তারিখ প্রয়োজন", expired: "মেয়াদোত্তীর্ণ", notProvided: "দেওয়া হয়নি", ok: "সঠিক", opt: "ঐচ্ছিক" }
+    };
+
+    function toggleLanguage() { currentLang = currentLang === 'en' ? 'bn' : 'en'; renderApp(); switchTab(1); }
+
     function renderApp() {
-        const t = currentLang === 'en' ? { appTitle: "Tender Package Builder", btnLang: "বাংলায় দেখুন", jsonLoad: "Step 1: Database Initialization", thReq: "Requirement", thFile: "Matched File", thExpiry: "Expiry Date", thStatus: "Validation", btnGen: "Compile Final Package", missing: "Missing", expiryNeeded: "Expiry Needed", expired: "Expired", notProvided: "Not provided", ok: "Validated", optional: "Optional" } : { appTitle: "দরপত্র প্যাকেজ নির্মাতা", btnLang: "View in English", jsonLoad: "ধাপ ১: ডেটাবেস ইনিশিয়ালাইজেশন", thReq: "প্রয়োজনীয়তা", thFile: "ফাইল", thExpiry: "মেয়াদ", thStatus: "অবস্থা", btnGen: "চূড়ান্ত প্যাকেজ তৈরি করুন", missing: "অনুপস্থিত", expiryNeeded: "তারিখ প্রয়োজন", expired: "মেয়াদোত্তীর্ণ", notProvided: "দেওয়া হয়নি", ok: "সঠিক", optional: "ঐচ্ছিক" };
-
-        document.getElementById('app-title').innerText = t.appTitle; document.getElementById('btn-lang').innerText = t.btnLang;
+        const t = tDict[currentLang];
         
-        if(!tenderData) {
-            document.getElementById('json-upload-area').style.display = 'block'; document.getElementById('workspace-area').style.display = 'none';
-            document.getElementById('title-load-json').innerText = t.jsonLoad; return;
-        } else {
-            document.getElementById('json-upload-area').style.display = 'none'; document.getElementById('workspace-area').style.display = 'block';
-        }
-
-        document.getElementById('th-req').innerText = t.thReq; document.getElementById('th-file').innerText = t.thFile;
-        document.getElementById('th-expiry').innerText = t.thExpiry; document.getElementById('th-status').innerText = t.thStatus;
+        // Static UI Update
+        document.getElementById('btn-lang-text').innerText = t.langBtn; document.getElementById('btn-reset-text').innerText = t.resetBtn;
+        document.getElementById('t-nav-1').innerText = t.nav1; document.getElementById('t-nav-2').innerText = t.nav2; document.getElementById('t-nav-3').innerText = t.nav3; document.getElementById('t-nav-4').innerText = t.nav4;
+        document.getElementById('t-s1-h1').innerText = t.s1h1; document.getElementById('t-s1-h2').innerText = t.s1h2; document.getElementById('t-s1-p').innerText = t.s1p; document.getElementById('t-s1-h3').innerText = t.s1h3;
+        document.getElementById('t-s2-h1').innerText = t.s2h1; document.getElementById('t-s2-h2').innerText = t.s2h2; document.getElementById('t-s2-p').innerText = t.s2p;
+        document.getElementById('t-s3-h1').innerText = t.s3h1; document.getElementById('th-req').innerText = t.thReq; document.getElementById('th-file').innerText = t.thFile; document.getElementById('th-expiry').innerText = t.thExp; document.getElementById('th-status').innerText = t.thStat;
+        document.getElementById('t-s4-h1').innerText = t.s4h1; document.getElementById('t-b-m1').innerText = t.t1; document.getElementById('t-b-s1').innerText = t.t2; document.getElementById('t-b-e1').innerText = t.t3;
         document.getElementById('btn-gen-text').innerText = t.btnGen;
 
-        document.getElementById('tender-details').innerHTML = `
-            <div class="info-item"><span class="info-label">Tender Reference</span><span class="info-value">${tenderData.tender_id}</span></div>
-            <div class="info-item"><span class="info-label">Project Title</span><span class="info-value">${tenderData.title}</span></div>
-            <div class="info-item"><span class="info-label">Procuring Entity</span><span class="info-value">${tenderData.procuring_entity}</span></div>
-            <div class="info-item"><span class="info-label">Filing Organization</span><span class="info-value">${tenderData.bidder}</span></div>
-            <div class="info-item"><span class="info-label">Strict Deadline</span><span class="info-value" style="color:var(--primary); font-weight:800;">${tenderData.submission_deadline}</span></div>
-        `;
+        if(tenderData) {
+            document.getElementById('tender-details').innerHTML = `
+                <div class="info-item"><span class="info-label">Tender Reference</span><span class="info-value">${tenderData.tender_id}</span></div>
+                <div class="info-item"><span class="info-label">Project Title</span><span class="info-value">${tenderData.title}</span></div>
+                <div class="info-item"><span class="info-label">Procuring Entity</span><span class="info-value">${tenderData.procuring_entity}</span></div>
+                <div class="info-item"><span class="info-label">Filing Organization</span><span class="info-value">${tenderData.bidder}</span></div>
+                <div class="info-item"><span class="info-label">Strict Deadline</span><span class="info-value" style="color:var(--brand-primary); font-weight:800;">${tenderData.submission_deadline}</span></div>
+            `;
+        }
 
         document.getElementById('uploaded-files-list').innerHTML = uploadedFiles.map(f => `
-            <div class="file-card">
-                <div class="file-detail">
-                    <span class="file-name" title="${f.name}">${f.name}</span><span class="file-meta">${f.pages} pages</span>
-                    ${f.isDuplicate ? `<span class="badge-duplicate">Duplicate Content Triggered</span>` : ''}
+            <div class="file-item">
+                <div class="file-info">
+                    <span class="file-name" title="${f.name}"><i class="fa-solid fa-file-pdf" style="color:var(--brand-secondary); margin-right:5px;"></i> ${f.name}</span>
+                    <span class="file-meta">${f.pages} pages</span>
+                    ${f.isDuplicate ? `<span class="badge-dup"><i class="fa-solid fa-triangle-exclamation"></i> Duplicate Content</span>` : ''}
                 </div>
-                <button class="icon-btn" onclick="removeFile('${f.id}')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button class="btn-icon" onclick="removeFile('${f.id}')" title="Delete File"><i class="fa-solid fa-trash"></i></button>
             </div>
         `).join('');
 
         const tbody = document.getElementById('requirements-body'); tbody.innerHTML = '';
-        let hasError = false; let errorList = [];
+        let hasError = false; let errorCount = 0;
 
         requirements.sort((a, b) => a.order - b.order).forEach(req => {
             const stat = getStatus(req);
             const reqTitle = currentLang === 'en' ? req.title_en : (req.title_bn || req.title_en);
-            if (stat.block) { hasError = true; errorList.push(`[${reqTitle}]: ${t[stat.code]}`); }
+            if (stat.block) { hasError = true; errorCount++; }
 
             let opts = `<option value="">-- Select File Resource --</option>`;
             uploadedFiles.forEach(f => {
                 const usedByOther = Object.values(matches).includes(f.id) && matches[req.id] !== f.id;
+                // Strict 4.6 logic: Duplicates are disabled and invisible from mapping
                 if (!f.isDuplicate && !usedByOther) opts += `<option value="${f.id}" ${matches[req.id] === f.id ? 'selected' : ''}>${f.name}</option>`;
             });
 
+            // Prevent assigning duplicate via memory loophole
             if (matches[req.id]) {
                 const matchedFile = uploadedFiles.find(file => file.id === matches[req.id]);
                 if (!matchedFile || matchedFile.isDuplicate) { updateMatch(req.id, ""); return; }
@@ -538,10 +650,10 @@
 
             tbody.innerHTML += `
                 <tr>
-                    <td><div style="font-weight:700; color:#1E293B;">${req.order}. ${reqTitle} ${!req.mandatory ? `<span style="font-size:0.75rem;color:var(--text-muted); font-weight:600;">(${t.optional})</span>` : ''}</div></td>
+                    <td><div style="font-weight:700; color:var(--text-main);">${req.order}. ${reqTitle} ${!req.mandatory ? `<span style="font-size:0.75rem;color:var(--text-muted); font-weight:600;">(${t.opt})</span>` : ''}</div></td>
                     <td><select onchange="updateMatch('${req.id}', this.value)">${opts}</select></td>
                     <td>${dateInput}</td>
-                    <td><div class="badge ${stat.css}">${t[stat.code]}</div></td>
+                    <td><div class="badge ${stat.css}"><i class="fa-solid ${stat.icon}"></i> ${t[stat.code]}</div></td>
                 </tr>`;
         });
 
@@ -549,16 +661,18 @@
         if (hasError || requirements.length === 0) {
             btnGen.disabled = true; 
             if(requirements.length > 0) {
-                errBox.style.display = 'flex'; errBox.innerHTML = `<span style="margin-right:10px;">⚠️</span> Compilation Blocked: Resolve ${errorList.length} conflict(s).`;
+                errBox.style.display = 'flex'; document.getElementById('fab-error-msg').innerText = `${errorCount} Task(s) Pending`;
             } else { errBox.style.display = 'none'; }
         } else { btnGen.disabled = false; errBox.style.display = 'none'; }
     }
 
-    function toggleLanguage() { currentLang = currentLang === 'en' ? 'bn' : 'en'; renderApp(); }
-
-    // --- COMPILE PDF ---
+    // --- TASK 4.7, 4.8 & SECTION 6 (PDF GEN) ---
     async function generatePackage() {
-        const btnText = document.getElementById('btn-gen-text'); btnText.innerText = "Processing Render..."; document.getElementById('btn-generate').disabled = true;
+        const btnGen = document.getElementById('btn-generate');
+        const originalText = btnGen.innerHTML;
+        btnGen.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...'; 
+        btnGen.disabled = true;
+
         try {
             const { PDFDocument, rgb, StandardFonts } = PDFLib; 
             const finalDoc = await PDFDocument.create();
@@ -566,6 +680,7 @@
             
             const engFont = await finalDoc.embedFont(StandardFonts.Helvetica); 
             const engBold = await finalDoc.embedFont(StandardFonts.HelveticaBold);
+            // Load Bangla Font (Kalpurush)
             const banglaBytes = await fetch('https://cdn.jsdelivr.net/gh/shironamhin/bangla-fonts/kalpurush.ttf').then(res => res.arrayBuffer());
             const banglaFont = await finalDoc.embedFont(banglaBytes);
             const activeFont = currentLang === 'bn' ? banglaFont : engFont;
@@ -573,6 +688,7 @@
             let pngSeal = null; if(customSealBase64) pngSeal = await finalDoc.embedPng(customSealBase64);
             const sealMode = document.getElementById('seal-placement').value;
 
+            // --- Cover Page (Sec 6.1) ---
             const cvr = finalDoc.addPage(); let y = cvr.getSize().height - 100;
             const write = (txt, sz, fnt, gap) => { cvr.drawText(txt, { x: 50, y, size: sz, font: fnt }); y -= gap; };
 
@@ -592,6 +708,7 @@
                 }
             }
 
+            // --- Bonus: Index Page ---
             const indexPg = finalDoc.addPage(); let idxY = indexPg.getSize().height - 100;
             indexPg.drawText(currentLang === 'en' ? "INDEX" : "সূচিপত্র", { x: 50, y: idxY, size: 22, font: activeFont }); idxY -= 50;
             indexData.forEach(item => {
@@ -600,6 +717,7 @@
                 idxY -= 30;
             });
 
+            // --- Sec 6.2: Append Files ---
             for (const req of sortedReqs) {
                 if (matches[req.id]) {
                     const f = uploadedFiles.find(x => x.id === matches[req.id]);
@@ -609,6 +727,7 @@
                 }
             }
 
+            // --- Sec 6.3 & Bonus Seal: Footers ---
             const tPages = finalDoc.getPageCount(); const pages = finalDoc.getPages();
             for (let i = 0; i < tPages; i++) {
                 const p = pages[i]; const w = p.getSize().width;
@@ -623,10 +742,12 @@
                 }
             }
 
+            // --- Task 4.8: Export ---
             const blob = new Blob([await finalDoc.save()], { type: 'application/pdf' }); 
             const lnk = document.createElement('a'); lnk.href = URL.createObjectURL(blob); lnk.download = `${tenderData.tender_id}_Package.pdf`; lnk.click();
-        } catch (e) { alert("Compilation Failed."); } 
-        finally { btnText.innerText = currentLang === 'en' ? "Compile Final Package" : "চূড়ান্ত প্যাকেজ তৈরি করুন"; document.getElementById('btn-generate').disabled = false; renderApp(); }
+            showToast("Package Generated Successfully!");
+        } catch (e) { showToast("Compilation Failed. Ensure files are valid.", "error"); } 
+        finally { btnGen.innerHTML = originalText; btnGen.disabled = false; renderApp(); }
     }
 </script>
 
