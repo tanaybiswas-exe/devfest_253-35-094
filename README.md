@@ -10,7 +10,7 @@ A high-performance, enterprise-grade frontend-only web application built for the
 ---
 
 ## Live Deployment Link
-* **Live HTTPS URL:** [Insert your Vercel / Netlify / GitHub Pages live link here]
+* **Live HTTPS URL:** https://tender-x.netlify.app/
 
 ---
 
