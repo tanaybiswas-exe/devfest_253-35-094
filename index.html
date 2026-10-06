@@ -10,7 +10,87 @@
     <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        :root {
+            --primary: #2563eb; --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc; --surface: #ffffff;
+            --text-main: #0f172a; --text-muted: #64748b;
+            --border: #e2e8f0; --border-focus: #94a3b8;
+            --success-bg: #dcfce7; --success-text: #166534;
+            --danger-bg: #fee2e2; --danger-text: #991b1b;
+            --warning-bg: #fef9c3; --warning-text: #854d0e;
+            --neutral-bg: #f1f5f9; --neutral-text: #475569;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: var(--surface); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .app-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+        .app-subtitle { color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem; }
+        .btn-group { display: flex; gap: 1rem; }
+        .btn-outline { padding: 0.5rem 1rem; background: white; border: 1px solid var(--border); border-radius: 8px; font-weight: 600; color: var(--text-main); cursor: pointer; transition: 0.2s; }
+        .btn-outline:hover { background: var(--neutral-bg); border-color: var(--border-focus); }
+        .btn-reset { color: #dc2626; border-color: #fca5a5; }
+        .btn-reset:hover { background: #fef2f2; border-color: #ef4444; }
+
+        .card { background: var(--surface); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+        .info-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+        .info-value { font-size: 1rem; font-weight: 500; }
+
+        .upload-zone { border: 2px dashed #cbd5e1; padding: 3rem 2rem; text-align: center; border-radius: 12px; background: var(--neutral-bg); cursor: pointer; position: relative; transition: all 0.2s; }
+        .upload-zone:hover { border-color: var(--primary); background: #eff6ff; }
+        .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .upload-icon { color: var(--primary); margin-bottom: 1rem; }
+        .json-upload-zone { border: 2px dashed var(--primary); background: #eff6ff; padding: 4rem 2rem; }
+
+        .file-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .file-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .file-detail { display: flex; flex-direction: column; overflow: hidden; width: 80%; }
+        .file-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .badge-duplicate { background: var(--danger-bg); color: var(--danger-text); padding: 0.1rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-top: 0.25rem; display: inline-block; width: max-content; }
+
+        .table-wrapper { overflow-x: auto; margin-top: 1rem; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: var(--neutral-bg); padding: 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 2px solid var(--border); }
+        td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+
+        select, input[type="date"], input[type="text"] { width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: inherit; transition: 0.2s; outline: none; background: var(--surface); color: var(--text-main); }
+        select:focus, input[type="date"]:focus, input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        .badge { padding: 0.4rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .b-missing, .b-expired { background: var(--danger-bg); color: var(--danger-text); }
+        .b-expiryNeeded { background: var(--warning-bg); color: var(--warning-text); }
+        .b-ok { background: var(--success-bg); color: var(--success-text); }
+        .b-optional { background: var(--neutral-bg); color: var(--neutral-text); }
+
+        .action-area { position: sticky; bottom: 2rem; background: var(--surface); padding: 1.5rem; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 1rem; z-index: 100; }
+        .btn-generate { padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+        .btn-generate:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-2px); }
+        .btn-generate:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.8; }
+        .error-box { background: var(--danger-bg); color: var(--danger-text); border: 1px solid #f87171; padding: 1rem; border-radius: 10px; font-size: 0.9rem; }
+        .icon-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 6px; }
+        .icon-btn:hover { background: var(--danger-bg); color: var(--danger-text); }
+
+        /* --- BONUS FEATURES STYLES --- */
+        .bonus-card { border: 1px dashed #a5b4fc; background: #fefeff; }
+        .bonus-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .bonus-box { padding: 1.5rem; background: var(--neutral-bg); border-radius: 12px; border: 1px solid var(--border); }
+        .bonus-box h4 { margin-bottom: 1rem; color: #4338ca; font-size: 0.95rem; }
+        .btn-bonus { width: 100%; padding: 0.6rem; margin-bottom: 0.5rem; background: white; border: 1px solid var(--border); border-radius: 6px; font-weight: 500; cursor: pointer; transition: 0.2s; font-size: 0.85rem;}
+        .btn-bonus:hover { border-color: var(--primary); color: var(--primary); }
+
+        #workspace-area { display: none; }
+        #json-upload-area { display: block; }
+    </style>
 </head>
 <body>
 
@@ -18,7 +98,7 @@
     <header class="app-header">
         <div>
             <h1 class="app-title" id="app-title">Tender Package Builder</h1>
-            <p class="app-subtitle">Developer: Mahmud Al-Hadi (251-35-505) | AI DevFest</p>
+            <p class="app-subtitle">Developer: Mahmud Al-Hadi (251-35-505) | AI DevFest 2026</p>
         </div>
         <div class="btn-group">
             <button class="btn-outline btn-reset" onclick="hardReset()" id="btn-reset">Reset All Data</button>
@@ -142,6 +222,396 @@
     </div>
 </div>
 
-<script src="app.js"></script>
+<!-- JavaScript Logic Embedded Directly -->
+<script>
+    let currentLang = 'en'; 
+    let tenderData = null; 
+    let requirements = []; 
+    let uploadedFiles = []; 
+    let matches = {}; 
+    let expiries = {}; 
+    let customSealBase64 = null; 
+
+    // --- Base64 Converters for Storage ---
+    function abToBase64(buffer) {
+        let binary = ''; const bytes = new Uint8Array(buffer);
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+        return window.btoa(binary);
+    }
+
+    function base64ToAb(base64) {
+        const binStr = window.atob(base64); const len = binStr.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) bytes[i] = binStr.charCodeAt(i);
+        return bytes.buffer;
+    }
+
+    // --- Persistence ---
+    function saveState() {
+        try {
+            if(tenderData) localStorage.setItem('v_data', JSON.stringify(tenderData));
+            if(requirements.length) localStorage.setItem('v_reqs', JSON.stringify(requirements));
+            localStorage.setItem('v_match', JSON.stringify(matches));
+            localStorage.setItem('v_exp', JSON.stringify(expiries));
+            if(customSealBase64) localStorage.setItem('v_seal', customSealBase64);
+            
+            const filesData = uploadedFiles.map(f => ({
+                id: f.id, name: f.name, pages: f.pages, isDuplicate: f.isDuplicate, base64: abToBase64(f.buffer)
+            }));
+            localStorage.setItem('v_files', JSON.stringify(filesData));
+        } catch(e) { console.warn("Storage limits exceeded."); }
+    }
+
+    function loadState() {
+        try {
+            const td = localStorage.getItem('v_data'); if(td) tenderData = JSON.parse(td);
+            const rq = localStorage.getItem('v_reqs'); if(rq) requirements = JSON.parse(rq);
+            const mt = localStorage.getItem('v_match'); if(mt) matches = JSON.parse(mt);
+            const ex = localStorage.getItem('v_exp'); if(ex) expiries = JSON.parse(ex);
+            const seal = localStorage.getItem('v_seal'); if(seal) { customSealBase64 = seal; document.getElementById('seal-status').innerText = "Seal Loaded!"; }
+            
+            const fl = localStorage.getItem('v_files');
+            if(fl) {
+                uploadedFiles = JSON.parse(fl).map(f => ({
+                    id: f.id, name: f.name, pages: f.pages, isDuplicate: f.isDuplicate, buffer: base64ToAb(f.base64)
+                }));
+            }
+        } catch(e) {}
+        checkDuplicates(); renderApp();
+    }
+
+    window.onload = () => loadState();
+
+    function hardReset() {
+        if(confirm("Reset all data and clear uploaded files?")) {
+            tenderData = null; requirements = []; matches = {}; expiries = {}; uploadedFiles = []; customSealBase64 = null;
+            localStorage.clear(); renderApp();
+        }
+    }
+
+    // --- Main Tasks: Uploads ---
+    async function handleJsonUpload(event) {
+        const file = event.target.files[0]; if (!file) return;
+        try {
+            const text = await file.text(); const data = JSON.parse(text);
+            if(!data.tender || !data.requirements) { alert("Invalid format! Expected 'tender' and 'requirements'."); return; }
+            tenderData = data.tender; requirements = data.requirements;
+            saveState(); renderApp();
+        } catch (error) { alert("Error reading JSON file."); }
+    }
+
+    async function handlePdfUpload(event) {
+        for (let file of event.target.files) {
+            if (file.type !== "application/pdf") { alert(`Rejected: ${file.name} is not a PDF.`); continue; }
+            const buffer = await file.arrayBuffer(); let pages = 0;
+            
+            try { 
+                const pdf = await PDFLib.PDFDocument.load(buffer, { ignoreEncryption: true }); 
+                if(pdf.isEncrypted) throw new Error("Password Protected");
+                pages = pdf.getPageCount(); 
+            } catch(e) { 
+                alert(`Skipped ${file.name}: The PDF is damaged or Password Protected. Please upload a clear file.`); 
+                continue; 
+            }
+            
+            uploadedFiles.push({ id: 'f_' + Date.now() + Math.random(), name: file.name, buffer: buffer, pages: pages, isDuplicate: false });
+        }
+        event.target.value = ''; checkDuplicates(); saveState(); renderApp();
+    }
+
+    function removeFile(fileId) {
+        uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
+        for (let reqId in matches) if (matches[reqId] === fileId) { delete matches[reqId]; delete expiries[reqId]; }
+        checkDuplicates(); saveState(); renderApp();
+    }
+
+    function checkDuplicates() {
+        uploadedFiles.forEach(f => f.isDuplicate = false);
+        for (let i = 0; i < uploadedFiles.length; i++) {
+            for (let j = i + 1; j < uploadedFiles.length; j++) {
+                if (uploadedFiles[i].buffer.byteLength === uploadedFiles[j].buffer.byteLength) {
+                    const a = new Uint8Array(uploadedFiles[i].buffer), b = new Uint8Array(uploadedFiles[j].buffer);
+                    let isSame = true;
+                    for (let k = 0; k < a.length; k++) { if (a[k] !== b[k]) { isSame = false; break; } }
+                    if(isSame) { uploadedFiles[i].isDuplicate = true; uploadedFiles[j].isDuplicate = true; }
+                }
+            }
+        }
+    }
+
+    function getStatus(req) {
+        if(!tenderData) return { code: 'missing', block: true, css: 'b-missing' };
+        const fileId = matches[req.id];
+        if (req.mandatory && !fileId) return { code: 'missing', block: true, css: 'b-missing' };
+        if (!req.mandatory && !fileId) return { code: 'notProvided', block: false, css: 'b-optional' };
+        if (req.has_expiry && fileId) {
+            if (!expiries[req.id]) return { code: 'expiryNeeded', block: true, css: 'b-expiryNeeded' };
+            if (new Date(expiries[req.id]) < new Date(tenderData.submission_deadline)) return { code: 'expired', block: true, css: 'b-expired' };
+        }
+        return { code: 'ok', block: false, css: 'b-ok' };
+    }
+
+    function updateMatch(reqId, val) { if(!val){ delete matches[reqId]; delete expiries[reqId]; } else matches[reqId] = val; saveState(); renderApp(); }
+    function updateExpiry(reqId, val) { expiries[reqId] = val; saveState(); renderApp(); }
+
+    // --- BONUS TASKS LOGIC ---
+    function exportCSV() {
+        if(!requirements.length) return alert("No requirements loaded.");
+        let csvContent = "data:text/csv;charset=utf-8,Requirement,Matched File Name,Pages,Expiry Date,Status\n";
+        requirements.sort((a,b) => a.order - b.order).forEach(req => {
+            const file = uploadedFiles.find(f => f.id === matches[req.id]);
+            const fName = file ? `"${file.name}"` : "None";
+            const fPages = file ? file.pages : 0;
+            const exp = (req.has_expiry && matches[req.id] && expiries[req.id]) ? expiries[req.id] : "N/A";
+            const stat = getStatus(req).code;
+            csvContent += `"${req.title_en}",${fName},${fPages},${exp},${stat}\n`;
+        });
+        const link = document.createElement("a");
+        link.setAttribute("href", encodeURI(csvContent));
+        link.setAttribute("download", `${tenderData ? tenderData.tender_id : 'Tender'}_Checklist.csv`);
+        link.click();
+    }
+
+    function exportProject() {
+        if(!tenderData) return alert("Nothing to export.");
+        saveState(); 
+        const projectData = {
+            v_data: localStorage.getItem('v_data'), v_reqs: localStorage.getItem('v_reqs'),
+            v_match: localStorage.getItem('v_match'), v_exp: localStorage.getItem('v_exp'),
+            v_files: localStorage.getItem('v_files'), v_seal: localStorage.getItem('v_seal')
+        };
+        const blob = new Blob([JSON.stringify(projectData)], {type: "application/json"});
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+        link.download = `${tenderData.tender_id}_ProjectBackup.json`; link.click();
+    }
+
+    function importProject(event) {
+        const file = event.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if(data.v_data) localStorage.setItem('v_data', data.v_data);
+                if(data.v_reqs) localStorage.setItem('v_reqs', data.v_reqs);
+                if(data.v_match) localStorage.setItem('v_match', data.v_match);
+                if(data.v_exp) localStorage.setItem('v_exp', data.v_exp);
+                if(data.v_files) localStorage.setItem('v_files', data.v_files);
+                if(data.v_seal) localStorage.setItem('v_seal', data.v_seal);
+                loadState(); alert("Project Imported Successfully!");
+            } catch(err) { alert("Invalid Project File."); }
+        };
+        reader.readAsText(file);
+    }
+
+    function autoMatch() {
+        let matchedCount = 0;
+        requirements.forEach(req => {
+            if(!matches[req.id]) {
+                const keyword = req.title_en.toLowerCase().split(' ')[0]; 
+                const foundFile = uploadedFiles.find(f => !f.isDuplicate && !Object.values(matches).includes(f.id) && f.name.toLowerCase().includes(keyword));
+                if(foundFile) { matches[req.id] = foundFile.id; matchedCount++; }
+            }
+        });
+        saveState(); renderApp();
+        alert(`Auto-matched ${matchedCount} documents!`);
+    }
+
+    async function aiAutoMatch() {
+        const apiKey = document.getElementById('ai-api-key').value;
+        if(!apiKey) return alert("Please enter your Gemini API Key first.");
+        const btn = document.getElementById('btn-ai'); btn.innerText = "Thinking..."; btn.disabled = true;
+        
+        const unmatchedReqs = requirements.filter(r => !matches[r.id]).map(r => ({id: r.id, name: r.title_en}));
+        const availableFiles = uploadedFiles.filter(f => !f.isDuplicate && !Object.values(matches).includes(f.id)).map(f => ({id: f.id, name: f.name}));
+        
+        if(!unmatchedReqs.length || !availableFiles.length) { btn.innerText = "✨ AI Auto-Match"; btn.disabled = false; return alert("Nothing to match."); }
+
+        const prompt = `Match these files to requirements based on names. Requirements: ${JSON.stringify(unmatchedReqs)}. Files: ${JSON.stringify(availableFiles)}. Return strictly valid JSON array of objects with 'reqId' and 'fileId'. No markdown.`;
+
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+            const data = await response.json();
+            const resultText = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+            const aiMatches = JSON.parse(resultText);
+            
+            let count = 0;
+            aiMatches.forEach(m => { if(m.reqId && m.fileId) { matches[m.reqId] = m.fileId; count++; } });
+            saveState(); renderApp(); alert(`AI Matched ${count} documents!`);
+        } catch(e) { alert("AI Matching Failed. Check API Key."); }
+        btn.innerText = "✨ AI Auto-Match"; btn.disabled = false;
+    }
+
+    function handleSealUpload(event) {
+        const file = event.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            customSealBase64 = e.target.result;
+            document.getElementById('seal-status').innerText = "Seal Loaded! (" + file.name + ")";
+            saveState();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // --- Main Rendering ---
+    function renderApp() {
+        const t = currentLang === 'en' ? { appTitle: "Tender Package Builder", btnLang: "বাংলায় দেখুন", jsonLoad: "Step 1: Load Requirements", thReq: "Requirement", thFile: "Matched File", thExpiry: "Expiry Date", thStatus: "Status", btnGen: "Generate Package", missing: "Missing", expiryNeeded: "Expiry date needed", expired: "Expired", notProvided: "Not provided", ok: "OK", optional: "Optional" } : { appTitle: "দরপত্র প্যাকেজ নির্মাতা", btnLang: "View in English", jsonLoad: "ধাপ ১: প্রয়োজনীয়তা লোড করুন", thReq: "প্রয়োজনীয়তা", thFile: "ফাইল", thExpiry: "মেয়াদ", thStatus: "অবস্থা", btnGen: "প্যাকেজ তৈরি করুন", missing: "অনুপস্থিত", expiryNeeded: "তারিখ প্রয়োজন", expired: "মেয়াদোত্তীর্ণ", notProvided: "দেওয়া হয়নি", ok: "সঠিক", optional: "ঐচ্ছিক" };
+
+        document.getElementById('app-title').innerText = t.appTitle; document.getElementById('btn-lang').innerText = t.btnLang;
+        
+        if(!tenderData) {
+            document.getElementById('json-upload-area').style.display = 'block'; document.getElementById('workspace-area').style.display = 'none';
+            document.getElementById('title-load-json').innerText = t.jsonLoad; return;
+        } else {
+            document.getElementById('json-upload-area').style.display = 'none'; document.getElementById('workspace-area').style.display = 'block';
+        }
+
+        document.getElementById('th-req').innerText = t.thReq; document.getElementById('th-file').innerText = t.thFile;
+        document.getElementById('th-expiry').innerText = t.thExpiry; document.getElementById('th-status').innerText = t.thStatus;
+        document.getElementById('btn-gen-text').innerText = t.btnGen;
+
+        document.getElementById('tender-details').innerHTML = `
+            <div class="info-item"><span class="info-label">Tender ID</span><span class="info-value">${tenderData.tender_id}</span></div>
+            <div class="info-item"><span class="info-label">Title</span><span class="info-value">${tenderData.title}</span></div>
+            <div class="info-item"><span class="info-label">Procuring Entity</span><span class="info-value">${tenderData.procuring_entity}</span></div>
+            <div class="info-item"><span class="info-label">Bidder</span><span class="info-value">${tenderData.bidder}</span></div>
+            <div class="info-item"><span class="info-label">Deadline</span><span class="info-value" style="color:var(--primary); font-weight:700;">${tenderData.submission_deadline}</span></div>
+        `;
+
+        document.getElementById('uploaded-files-list').innerHTML = uploadedFiles.map(f => `
+            <div class="file-card">
+                <div class="file-detail">
+                    <span class="file-name" title="${f.name}">${f.name}</span><span class="file-meta">${f.pages} pages</span>
+                    ${f.isDuplicate ? `<span class="badge-duplicate">Duplicate Content Detected</span>` : ''}
+                </div>
+                <button class="icon-btn" onclick="removeFile('${f.id}')">✖</button>
+            </div>
+        `).join('');
+
+        const tbody = document.getElementById('requirements-body'); tbody.innerHTML = '';
+        let hasError = false; let errorList = [];
+
+        requirements.sort((a, b) => a.order - b.order).forEach(req => {
+            const stat = getStatus(req);
+            const reqTitle = currentLang === 'en' ? req.title_en : (req.title_bn || req.title_en);
+            if (stat.block) { hasError = true; errorList.push(`${reqTitle}: ${t[stat.code]}`); }
+
+            let opts = `<option value="">-- Select File --</option>`;
+            uploadedFiles.forEach(f => {
+                const usedByOther = Object.values(matches).includes(f.id) && matches[req.id] !== f.id;
+                if (!f.isDuplicate && !usedByOther) opts += `<option value="${f.id}" ${matches[req.id] === f.id ? 'selected' : ''}>${f.name}</option>`;
+            });
+
+            if (matches[req.id]) {
+                const matchedFile = uploadedFiles.find(file => file.id === matches[req.id]);
+                if (!matchedFile || matchedFile.isDuplicate) { updateMatch(req.id, ""); return; }
+            }
+
+            const dateInput = (req.has_expiry && matches[req.id]) ? `<input type="date" value="${expiries[req.id] || ''}" onchange="updateExpiry('${req.id}', this.value)">` : '-';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td><div style="font-weight:600;">${req.order}. ${reqTitle} ${!req.mandatory ? `<span style="font-size:0.75rem;color:gray;">(${t.optional})</span>` : ''}</div></td>
+                    <td><select onchange="updateMatch('${req.id}', this.value)">${opts}</select></td>
+                    <td>${dateInput}</td>
+                    <td><div class="badge ${stat.css}">${t[stat.code]}</div></td>
+                </tr>`;
+        });
+
+        const btnGen = document.getElementById('btn-generate'); const errBox = document.getElementById('blocking-errors');
+        if (hasError || requirements.length === 0) {
+            btnGen.disabled = true; 
+            if(requirements.length > 0) {
+                errBox.style.display = 'block'; errBox.innerHTML = `<strong>Action Required:</strong><ul style="margin-top:0.5rem; margin-left:1.2rem;"><li>${errorList.join('</li><li>')}</li></ul>`;
+            } else { errBox.style.display = 'none'; }
+        } else { btnGen.disabled = false; errBox.style.display = 'none'; }
+    }
+
+    function toggleLanguage() { currentLang = currentLang === 'en' ? 'bn' : 'en'; renderApp(); }
+
+    // --- PACKAGE GENERATION ---
+    async function generatePackage() {
+        const btnText = document.getElementById('btn-gen-text'); btnText.innerText = "Processing Document..."; document.getElementById('btn-generate').disabled = true;
+        try {
+            const { PDFDocument, rgb, StandardFonts } = PDFLib; 
+            const finalDoc = await PDFDocument.create();
+            finalDoc.registerFontkit(window.fontkit);
+            
+            const engFont = await finalDoc.embedFont(StandardFonts.Helvetica); 
+            const engBold = await finalDoc.embedFont(StandardFonts.HelveticaBold);
+            const banglaBytes = await fetch('https://cdn.jsdelivr.net/gh/shironamhin/bangla-fonts/kalpurush.ttf').then(res => res.arrayBuffer());
+            const banglaFont = await finalDoc.embedFont(banglaBytes);
+            const activeFont = currentLang === 'bn' ? banglaFont : engFont;
+
+            let pngSeal = null;
+            if(customSealBase64) pngSeal = await finalDoc.embedPng(customSealBase64);
+            const sealMode = document.getElementById('seal-placement').value;
+
+            // Cover Page
+            const cvr = finalDoc.addPage(); 
+            let y = cvr.getSize().height - 80;
+            const write = (txt, sz, fnt, gap) => { cvr.drawText(txt, { x: 50, y, size: sz, font: fnt }); y -= gap; };
+
+            write(currentLang === 'en' ? "TENDER DOCUMENT PACKAGE" : "দরপত্র নথি প্যাকেজ", 22, activeFont, 40);
+            write(`Tender ID: ${tenderData.tender_id}`, 12, engFont, 25); write(`Title: ${tenderData.title}`, 12, engFont, 25);
+            write(`Procuring Entity: ${tenderData.procuring_entity}`, 12, engFont, 25); write(`Bidder: ${tenderData.bidder}`, 12, engFont, 25);
+            write(`Submission Deadline: ${tenderData.submission_deadline}`, 12, engFont, 25); write(`Date Generated: ${new Date().toISOString().split('T')[0]}`, 12, engFont, 50);
+
+            let pageCounter = 3; 
+            const indexData = [];
+            const sortedReqs = [...requirements].sort((a,b) => a.order - b.order);
+            for (const req of sortedReqs) {
+                if (matches[req.id]) {
+                    const f = uploadedFiles.find(x => x.id === matches[req.id]);
+                    const docTitle = currentLang === 'en' ? req.title_en : (req.title_bn || req.title_en);
+                    indexData.push({ title: `${req.order}. ${docTitle}`, start: pageCounter });
+                    pageCounter += f.pages;
+                }
+            }
+
+            // Index Page
+            const indexPg = finalDoc.addPage();
+            let idxY = indexPg.getSize().height - 80;
+            indexPg.drawText(currentLang === 'en' ? "INDEX" : "সূচিপত্র", { x: 50, y: idxY, size: 20, font: activeFont }); idxY -= 40;
+            indexData.forEach(item => {
+                indexPg.drawText(item.title, { x: 50, y: idxY, size: 12, font: activeFont });
+                indexPg.drawText(`Page ${item.start}`, { x: 450, y: idxY, size: 12, font: engFont });
+                idxY -= 25;
+            });
+
+            // Documents
+            for (const req of sortedReqs) {
+                if (matches[req.id]) {
+                    const f = uploadedFiles.find(x => x.id === matches[req.id]);
+                    const srcDoc = await PDFDocument.load(f.buffer); 
+                    const pgs = await finalDoc.copyPages(srcDoc, srcDoc.getPageIndices());
+                    pgs.forEach(p => finalDoc.addPage(p));
+                }
+            }
+
+            // Footers & Seal
+            const tPages = finalDoc.getPageCount(); const pages = finalDoc.getPages();
+            for (let i = 0; i < tPages; i++) {
+                const p = pages[i]; const w = p.getSize().width;
+                p.drawRectangle({ x: 0, y: 10, width: w, height: 25, color: rgb(1, 1, 1) });
+                p.drawText(`${tenderData.tender_id} | Page ${i+1} of ${tPages}`, { x: w/2 - 60, y: 18, size: 10, font: engFont });
+
+                if(pngSeal) {
+                    const isCoverOrIndex = (i === 0 || i === 1);
+                    if (sealMode === 'all' || (sealMode === 'cover' && isCoverOrIndex)) {
+                        p.drawImage(pngSeal, { x: w - 150, y: 50, width: 100, height: 50, opacity: 0.8 });
+                    }
+                }
+            }
+
+            const blob = new Blob([await finalDoc.save()], { type: 'application/pdf' }); 
+            const lnk = document.createElement('a'); lnk.href = URL.createObjectURL(blob); lnk.download = `${tenderData.tender_id}_Package.pdf`; lnk.click();
+        } catch (e) { alert("Error generating PDF. Please check your files."); console.error(e); } 
+        finally { btnText.innerText = currentLang === 'en' ? "Generate Package" : "প্যাকেজ তৈরি করুন"; document.getElementById('btn-generate').disabled = false; renderApp(); }
+    }
+</script>
+
 </body>
 </html>
